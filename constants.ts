@@ -27,6 +27,7 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'MTNEWS', tags: ['Agent'], character: '3amar Bin Abdulhamid' },
   { username: 'xMusaad', tags: ['Agent'], character: 'Musa3d' },
   { username: 'odn35', tags: ['CIA', 'DS'], character: 'None' },
+  { username: 'iABS', tags: ['CIA'], character: 'Aba Alhreth' },
   { username: 'abu_saad3', tags: ['CIA', 'DS'], character: 'None' },
   { username: 'craed', tags: ['CIA', 'DS'], character: 'None' },
   { username: 'sniperxzaid', tags: ['CIA', 'DS'], character: 'None' },
