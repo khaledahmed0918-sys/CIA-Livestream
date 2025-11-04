@@ -8,7 +8,7 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'tmnaa', tags: ['CIA', 'DO Deputy Director'], character: 'Abdullah Alshmmari' },
   { username: 'RpWy', tags: ['CIA', 'DO'], character: 'Abdullah Khalid' },
   { username: 'Ab2dy', tags: ['CIA', 'DO'], character: 'Abdullah Abd Al-Aziz' },
-  { username: 'brof', tags: ['CIA', 'DO'], character: 'Brof' },
+  { username: 'brof2', tags: ['CIA', 'DO'], character: 'Brof' },
   { username: 'PROMT3B', tags: ['CIA', 'Death Battelion Deputy'], character: 'DON' },
   { username: 'Fahad', tags: ['CIA', 'DO'], character: 'Fahad Saad' },
   { username: 'Muvxn', tags: ['CIA', 'DO'], character: 'Musab Al Sultan' },
