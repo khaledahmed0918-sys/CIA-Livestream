@@ -1,0 +1,5 @@
+{
+  "name": "CIA Live Streams",
+  "description": "A responsive web app that lists a set of Kick usernames and displays their live/offline status on glassmorphism-style cards. The app polls for updates and features a light/dark mode.",
+  "requestFramePermissions": []
+}
