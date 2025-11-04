@@ -33,7 +33,7 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'craed', tags: ['CIA', 'DS'], character: 'Wiliam Coby' },
   { username: 'sniperxzaid', tags: ['CIA', 'DS'], character: 'Zaid Muhammad' },
   { username: '0xsultan', tags: ['CIA', 'DS'], character: 'Anonymous' },
-  { username: 'tqrolld', tags: ['CIA', 'DS'], character: 'None' },
+  { username: 'tqrolld', tags: ['CIA', 'DS'], character: 'Victor Rundn' },
 ];
 
 export const POLLING_INTERVAL_SECONDS: number = 90;
