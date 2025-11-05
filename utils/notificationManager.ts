@@ -28,7 +28,7 @@ export const requestNotificationPermission = async (): Promise<NotificationPermi
 };
 
 // Function to show a notification when a streamer goes live
-export const showLiveNotification = async (streamer: Channel) => {
+export const showLiveNotification = async (streamer: Channel, bodyText: string) => {
   if (!('Notification' in window) || Notification.permission !== 'granted') {
     return; // Silently exit if notifications aren't supported or permission isn't granted
   }
@@ -48,7 +48,7 @@ export const showLiveNotification = async (streamer: Channel) => {
   
   const notificationTitle = streamer.display_name;
   const notificationOptions: NotificationOptions = {
-    body: streamer.live_title || `${streamer.display_name} is now live!`,
+    body: bodyText,
     icon: streamer.profile_pic || '/vite.svg',
     data: {
       url: streamer.live_url,

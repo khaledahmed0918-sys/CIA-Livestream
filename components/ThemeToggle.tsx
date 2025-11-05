@@ -1,15 +1,18 @@
 
+
 import React from 'react';
 import { useTheme } from '../hooks/useTheme';
+import { useLocalization } from '../hooks/useLocalization';
 
 export const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const { t } = useLocalization();
 
   return (
     <button
       onClick={toggleTheme}
       className="p-2 rounded-full bg-black/10 dark:bg-white/10 text-black dark:text-white backdrop-blur-sm transition-colors"
-      aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+      aria-label={t(theme === 'light' ? 'switchToDarkMode' : 'switchToLightMode')}
     >
       {theme === 'light' ? (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

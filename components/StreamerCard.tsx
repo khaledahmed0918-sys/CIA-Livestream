@@ -137,8 +137,8 @@ export const StreamerCard: React.FC<StreamerCardProps> = ({ streamer, onCardClic
 
   const tooltipText = streamer.is_live
     ? `${t('liveFor', { time: humanizeTime(streamer.live_since, language) })}`
-    : streamer.error 
-      ? `Last check failed: ${formatFullDateTime(streamer.last_checked_at, language)}`
+    : streamer.error
+      ? t('lastCheckFailed', { time: formatFullDateTime(streamer.last_checked_at, language) })
       : `${t('lastSeen')} ${formatFullDateTime(streamer.last_stream_start_time, language)}`;
 
   return (
@@ -211,13 +211,15 @@ export const StreamerCard: React.FC<StreamerCardProps> = ({ streamer, onCardClic
 
         <div className="flex items-end justify-between gap-4 mt-2">
             <div className="flex-1 min-w-0 text-sm">
-                {streamer.is_live && streamer.live_title && !streamer.error ? (
+                {streamer.error ? (
+                    <p className="truncate italic text-red-500">{t('failedToLoadData')}</p>
+                ) : streamer.is_live && streamer.live_title ? (
                     <Tooltip text={streamer.live_title}>
                         <p className="truncate cursor-default text-black/80 dark:text-white/80">
                             {streamer.live_title}
                         </p>
                     </Tooltip>
-                ) : !streamer.is_live && !streamer.error ? (
+                ) : !streamer.is_live ? (
                     streamer.bio ? (
                         <Tooltip text={streamer.bio}>
                             <p className="truncate italic text-black/70 dark:text-white/70">"{streamer.bio}"</p>

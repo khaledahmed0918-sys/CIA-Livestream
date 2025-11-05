@@ -11,14 +11,14 @@ import { StreamerModal } from './StreamerModal';
 
 // LanguageToggle Component
 const LanguageToggle: React.FC = () => {
-  const { language, setLanguage } = useLocalization();
+  const { language, setLanguage, t } = useLocalization();
   const toggleLanguage = () => setLanguage(language === 'en' ? 'ar' : 'en');
 
   return (
     <button
       onClick={toggleLanguage}
       className="p-2 rounded-full bg-black/10 dark:bg-white/10 text-black dark:text-white backdrop-blur-sm transition-colors"
-      aria-label={`Switch to ${language === 'en' ? 'Arabic' : 'English'}`}
+      aria-label={t('switchToLang', { lang: language === 'en' ? t('lang_ar') : t('lang_en') })}
     >
       <span className="font-bold text-lg">{language === 'en' ? 'AR' : 'EN'}</span>
     </button>
@@ -143,7 +143,8 @@ const App: React.FC = () => {
         data.data.forEach(currentStreamer => {
             const prevStreamer = prevStreamerDataRef.current?.data.find(s => s.username === currentStreamer.username);
             if(prevStreamer && !prevStreamer.is_live && currentStreamer.is_live) {
-                showLiveNotification(currentStreamer);
+                const notificationBody = currentStreamer.live_title || t('isNowLive', { name: currentStreamer.display_name });
+                showLiveNotification(currentStreamer, notificationBody);
             }
         });
       }
@@ -156,7 +157,7 @@ const App: React.FC = () => {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
       console.error(err);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchData();

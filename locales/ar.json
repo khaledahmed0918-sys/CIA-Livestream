@@ -44,5 +44,17 @@
   "allCategories": "كل الفئات",
   "copyLiveLinks": "نسخ روابط البث",
   "copyProfileLinks": "نسخ روابط الصفحات",
-  "streamTitle": "عنوان البث"
+  "streamTitle": "عنوان البث",
+  "switchToLang": "التبديل إلى {{lang}}",
+  "lang_ar": "العربية",
+  "lang_en": "الإنجليزية",
+  "lastCheckFailed": "فشل آخر فحص: {{time}}",
+  "switchToLightMode": "التبديل إلى الوضع الفاتح",
+  "switchToDarkMode": "التبديل إلى الوضع الداكن",
+  "socialTwitter": "إكس",
+  "socialYoutube": "يوتيوب",
+  "socialInstagram": "انستغرام",
+  "socialDiscord": "ديسكورد",
+  "isNowLive": "{{name}} بدأ البث الآن!",
+  "failedToLoadData": "فشل تحميل البيانات"
 }

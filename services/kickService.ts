@@ -98,7 +98,7 @@ const fetchKickChannel = async (originalUsername: string): Promise<Channel> => {
       display_name: originalUsername,
       profile_pic: null,
       is_live: false,
-      live_title: 'Failed to load data',
+      live_title: null,
       viewer_count: null,
       live_since: null,
       last_stream_start_time: null,

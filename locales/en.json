@@ -44,5 +44,17 @@
   "allCategories": "All Categories",
   "copyLiveLinks": "Copy Live Links",
   "copyProfileLinks": "Copy Profile Links",
-  "streamTitle": "Stream Title"
+  "streamTitle": "Stream Title",
+  "switchToLang": "Switch to {{lang}}",
+  "lang_ar": "Arabic",
+  "lang_en": "English",
+  "lastCheckFailed": "Last check failed: {{time}}",
+  "switchToLightMode": "Switch to light mode",
+  "switchToDarkMode": "Switch to dark mode",
+  "socialTwitter": "X",
+  "socialYoutube": "YouTube",
+  "socialInstagram": "Instagram",
+  "socialDiscord": "Discord",
+  "isNowLive": "{{name}} is now live!",
+  "failedToLoadData": "Failed to load data"
 }
