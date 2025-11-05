@@ -209,8 +209,10 @@ const App: React.FC = () => {
     if (query) {
        streamers = streamers.filter(streamer => {
         const firstCharacter = streamer.character?.split('|')[0].trim().toLowerCase() || '';
+        const liveTitle = streamer.live_title?.toLowerCase() || '';
         return streamer.username.toLowerCase().includes(query) ||
-        (streamer.character && firstCharacter.includes(query));
+               (streamer.character && firstCharacter.includes(query)) ||
+               (streamer.is_live && liveTitle.includes(query));
        });
     }
     
