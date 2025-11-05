@@ -1,4 +1,3 @@
-
 export interface Channel {
   username: string;
   display_name: string;
@@ -12,10 +11,14 @@ export interface Channel {
   profile_url: string;
   tags?: string[];
   character?: string;
+  characters?: string[];
   error?: boolean; // To indicate stale data
   last_checked_at?: string; // ISO8601 for stale data
   bio?: string;
   followers_count?: number;
+  banner_image: string | null;
+  live_category: string | null;
+  social_links?: { [platform: string]: string };
 }
 
 export interface KickApiResponse {

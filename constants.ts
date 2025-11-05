@@ -1,7 +1,8 @@
 
+
 export const KICK_STREAMERS: { username: string; tags: string[]; character: string }[] = [
   { username: 'SXB', tags: ['CIA', 'CIA Leaders', 'DO Director', 'DO'], character: 'Abdulsamad Alqurashi' },
-  { username: 'ysmo', tags: ['CIA', 'CIA Deputy Director'], character: 'Agent X' },
+  { username: 'https://kick.com/ysmo', tags: ['CIA', 'CIA Deputy Director'], character: 'Agent X' },
   { username: 'Osamah', tags: ['CIA', 'CIA Director'], character: 'Alexander Mahon' },
   { username: 'MOLO101', tags: ['CIA', 'DS Director', 'DS'], character: 'Dr.Anderw' },
   { username: 'lMeshari4', tags: ['CIA', 'CIA Leaders', 'DA Director'], character: 'Michael Conner' },

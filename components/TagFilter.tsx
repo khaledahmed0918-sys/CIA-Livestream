@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocalization } from '../hooks/useLocalization';
 
 interface TagFilterProps {
   allTags: string[];
@@ -10,6 +11,7 @@ export const TagFilter: React.FC<TagFilterProps> = ({ allTags, selectedTags, onS
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { t } = useLocalization();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -33,16 +35,16 @@ export const TagFilter: React.FC<TagFilterProps> = ({ allTags, selectedTags, onS
   const filteredTags = allTags.filter(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const getButtonLabel = () => {
-    if (selectedTags.length === 0) return "Filter by tags...";
+    if (selectedTags.length === 0) return t('filterByTags');
     if (selectedTags.length === 1) return selectedTags[0];
-    return `${selectedTags.length} tags selected`;
+    return t('tagsSelected', { count: selectedTags.length });
   };
 
   return (
     <div className="relative w-full" ref={wrapperRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-3 px-4 text-left text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all flex justify-between items-center"
+        className="w-full py-3 px-4 text-left rtl:text-right text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all flex justify-between items-center"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -59,7 +61,7 @@ export const TagFilter: React.FC<TagFilterProps> = ({ allTags, selectedTags, onS
               type="search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search tags..."
+              placeholder={t('searchTags')}
               className="w-full py-2 px-3 text-black bg-white/50 rounded-lg border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/50 dark:placeholder-gray-400"
             />
           </div>
@@ -73,7 +75,7 @@ export const TagFilter: React.FC<TagFilterProps> = ({ allTags, selectedTags, onS
                 aria-selected={selectedTags.includes(tag)}
               >
                 <div className={`w-4 h-4 rounded border-2 ${selectedTags.includes(tag) ? 'bg-blue-500 border-blue-500' : 'border-gray-400 dark:border-gray-500'}`}>
-                    {selectedTags.includes(tag) && <svg viewBox="0 0 16 16" fill="white"><path d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/></svg>}
+                    {selectedTags.includes(tag) && <svg viewBox="0 0 16 16" fill="white"><path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z"/></svg>}
                 </div>
                 <span>{tag}</span>
               </li>
