@@ -16,6 +16,7 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     return (localStorage.getItem('language') as Language) || 'en';
   });
   const [translations, setTranslations] = useState<{ [key in Language]?: Translations }>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -41,6 +42,8 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
             console.error("Failed to fetch translations:", error);
             // Set empty translations to avoid breaking the app
             setTranslations({ en: {}, ar: {} });
+        } finally {
+            setIsLoading(false);
         }
     };
     fetchTranslations();
@@ -53,6 +56,7 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const t = useCallback((key: string, replacements?: { [key: string]: string | number }) => {
     const langTranslations = translations[language];
+    // This check is still useful for keys that might not exist in the files.
     if (!langTranslations || Object.keys(langTranslations).length === 0) {
         return key;
     }
@@ -65,6 +69,11 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
     return translation;
   }, [language, translations]);
+
+  // Prevent rendering the app until translations are loaded to avoid showing keys.
+  if (isLoading) {
+    return null;
+  }
 
   return React.createElement(
     LocalizationContext.Provider,

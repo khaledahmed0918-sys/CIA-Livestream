@@ -6,7 +6,7 @@ const VAPID_PUBLIC_KEY = 'YOUR_VAPID_PUBLIC_KEY'; // This is not used for client
 export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
   if ('serviceWorker' in navigator) {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js');
+      const registration = await navigator.serviceWorker.register('/sw.js');
       console.log('Service Worker registered with scope:', registration.scope);
       return registration;
     } catch (error) {
