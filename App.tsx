@@ -317,7 +317,7 @@ const App: React.FC = () => {
                     className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none"
                     aria-label={t('sortBy')}
                 >
-                    <option value="status">{t('Sort By Status')}</option>
+                    <option value="status">{t('sortByStatus')}</option>
                     <option value="viewers_desc">{t('viewersHighToLow')}</option>
                 </select>
                 <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
