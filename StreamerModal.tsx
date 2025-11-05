@@ -79,7 +79,8 @@ export const StreamerModal: React.FC<StreamerModalProps> = ({ streamer, onClose 
   if (!streamer) return null;
 
   const characters = streamer.character?.split('|').map(c => c.trim()).filter(Boolean) || [];
-  const socialLinks = streamer.social_links ? Object.entries(streamer.social_links).filter(([, handle]) => handle) : [];
+  // FIX: Ensure social link handles are strings to prevent type errors.
+  const socialLinks = streamer.social_links ? Object.entries(streamer.social_links).filter(([, handle]) => typeof handle === 'string' && handle) : [];
 
   return (
     <div 
@@ -153,6 +154,13 @@ export const StreamerModal: React.FC<StreamerModalProps> = ({ streamer, onClose 
                 )}
             </div>
 
+            {streamer.is_live && streamer.live_title && (
+              <div className="mt-4">
+                <h3 className="font-bold text-lg mb-1">{t('streamTitle')}</h3>
+                <p className="text-black/80 dark:text-white/80 text-sm">{streamer.live_title}</p>
+              </div>
+            )}
+
             {streamer.bio && (
               <div className="mt-4">
                 <h3 className="font-bold text-lg mb-1">{t('bio')}</h3>
@@ -194,7 +202,7 @@ export const StreamerModal: React.FC<StreamerModalProps> = ({ streamer, onClose 
                         const metadata = socialMediaMetadata[platform];
                         if (!metadata) return null; // Only show platforms we have metadata for
                         
-                        const finalUrl = buildSocialLink(platform, handleOrUrl);
+                        const finalUrl = buildSocialLink(platform, handleOrUrl as string);
                         
                         return (
                         <a

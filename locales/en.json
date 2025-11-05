@@ -39,5 +39,10 @@
   "category": "Category",
   "tags": "Tags",
   "noRecentActivity": "No recent activity",
-  "socials": "Socials"
+  "socials": "Socials",
+  "filterByCategory": "Filter by category...",
+  "allCategories": "All Categories",
+  "copyLiveLinks": "Copy Live Links",
+  "copyProfileLinks": "Copy Profile Links",
+  "streamTitle": "Stream Title"
 }

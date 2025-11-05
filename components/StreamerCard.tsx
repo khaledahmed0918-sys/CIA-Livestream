@@ -62,32 +62,6 @@ const NotificationBell: React.FC<{
   );
 };
 
-const StatusBadge: React.FC<{ isLive: boolean; viewerCount: number | null }> = ({ isLive, viewerCount }) => {
-  const { t } = useLocalization();
-  return (
-    <div
-      className="absolute left-[-0.5rem] top-[-0.5rem] rtl:left-auto rtl:right-4 flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs font-semibold backdrop-blur-sm z-10"
-      aria-label={isLive ? t('live') : t('offline')}
-      role="status"
-    >
-      <span className={`h-2.5 w-2.5 rounded-full transition-colors duration-500 ${isLive ? 'bg-green-400 animate-[pulse-live_2s_infinite]' : 'bg-red-500 animate-[slow-fade_3s_ease-in-out_infinite]'}`}></span>
-      <span>{isLive ? t('live') : t('offline')}</span>
-      {isLive && viewerCount !== null && (
-        <>
-          <span className="text-white/30">|</span>
-          <div className="flex items-center gap-1 text-white/80">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-              <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-            </svg>
-            <span>{viewerCount.toLocaleString()}</span>
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
-
 const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => (
   <div className="group/tooltip relative">
     {children}
@@ -96,6 +70,41 @@ const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, 
     </span>
   </div>
 );
+
+const StatusBadge: React.FC<{ isLive: boolean; viewerCount: number | null; category: string | null }> = ({ isLive, viewerCount, category }) => {
+  const { t } = useLocalization();
+  return (
+    <div
+      className="absolute left-[-0.5rem] top-[-0.5rem] rtl:left-auto rtl:right-4 flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs font-semibold backdrop-blur-sm z-10"
+      aria-label={isLive ? t('live') : t('offline')}
+      role="status"
+    >
+      <span className={`h-2.5 w-2.5 rounded-full transition-colors duration-500 ${isLive ? 'bg-green-400 animate-[pulse-live_2s_infinite]' : 'bg-red-500 animate-[slow-fade_3s_ease-in-out_infinite]'}`}></span>
+      <span className="flex-shrink-0">{isLive ? t('live') : t('offline')}</span>
+      {isLive && viewerCount !== null && (
+        <>
+          <span className="text-white/30">|</span>
+          <div className="flex items-center gap-1 text-white/80 flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+              <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+            </svg>
+            <span>{viewerCount.toLocaleString()}</span>
+          </div>
+        </>
+      )}
+      {isLive && category && (
+        <>
+            <span className="text-white/30">|</span>
+            <Tooltip text={category}>
+                <span className="truncate max-w-[100px] text-white/80">{category}</span>
+            </Tooltip>
+        </>
+      )}
+    </div>
+  );
+};
+
 
 export const StreamerCard: React.FC<StreamerCardProps> = ({ streamer, onCardClick, isNotificationSubscribed, onNotificationToggle, notificationPermission }) => {
   const [isCopied, setIsCopied] = useState(false);
@@ -143,7 +152,7 @@ export const StreamerCard: React.FC<StreamerCardProps> = ({ streamer, onCardClic
       <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100 dark:from-white/5"></div>
       
       <div className="relative z-10 flex flex-col h-full">
-        <StatusBadge isLive={streamer.is_live} viewerCount={streamer.viewer_count} />
+        <StatusBadge isLive={streamer.is_live} viewerCount={streamer.viewer_count} category={streamer.live_category} />
         <div className="absolute top-2 right-2 rtl:right-auto rtl:left-2">
             <NotificationBell 
                 streamerName={streamer.username}

@@ -39,5 +39,10 @@
   "category": "الفئة",
   "tags": "العلامات",
   "noRecentActivity": "لا يوجد نشاط حديث",
-  "socials": "التواصل الاجتماعي"
+  "socials": "التواصل الاجتماعي",
+  "filterByCategory": "تصفية حسب الفئة...",
+  "allCategories": "كل الفئات",
+  "copyLiveLinks": "نسخ روابط البث",
+  "copyProfileLinks": "نسخ روابط الصفحات",
+  "streamTitle": "عنوان البث"
 }

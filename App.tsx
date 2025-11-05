@@ -65,8 +65,10 @@ const App: React.FC = () => {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [sortOption, setSortOption] = useState<'status' | 'viewers_desc'>('status');
   const [selectedStreamer, setSelectedStreamer] = useState<Channel | null>(null);
+  const [isLinksCopied, setIsLinksCopied] = useState(false);
   
   // Notification State
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | null>(null);
@@ -124,6 +126,14 @@ const App: React.FC = () => {
     const tags = KICK_STREAMERS.flatMap(streamer => streamer.tags);
     return [...new Set(tags)].sort();
   }, []);
+
+  const allCategories = useMemo(() => {
+    if (!streamerData?.data) return [];
+    const categories = streamerData.data
+      .map(streamer => streamer.live_category)
+      .filter((category): category is string => !!category && category.trim() !== '');
+    return [...new Set(categories)].sort();
+  }, [streamerData]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -186,6 +196,10 @@ const App: React.FC = () => {
     const query = searchQuery.toLowerCase().trim();
     let streamers = sortedStreamers;
 
+    if (selectedCategory) {
+      streamers = streamers.filter(streamer => streamer.live_category === selectedCategory);
+    }
+
     if (selectedTags.length > 0) {
       streamers = streamers.filter(streamer =>
         streamer.tags && streamer.tags.some(tag => selectedTags.includes(tag))
@@ -201,7 +215,33 @@ const App: React.FC = () => {
     }
     
     return streamers;
-  }, [sortedStreamers, searchQuery, selectedTags]);
+  }, [sortedStreamers, searchQuery, selectedTags, selectedCategory]);
+
+  const liveStreamersInFilter = useMemo(() => filteredStreamers.filter(s => s.is_live), [filteredStreamers]);
+
+  const handleCopyLinks = useCallback(() => {
+    let urlsToCopy: (string | null)[];
+
+    if (liveStreamersInFilter.length > 0) {
+        urlsToCopy = liveStreamersInFilter.map(s => s.live_url);
+    } else {
+        urlsToCopy = filteredStreamers.map(s => s.profile_url);
+    }
+
+    const urlsString = urlsToCopy.filter(Boolean).join('\n');
+
+    if (urlsString) {
+        navigator.clipboard.writeText(urlsString).then(() => {
+            setIsLinksCopied(true);
+            setTimeout(() => setIsLinksCopied(false), 2000);
+        }).catch(err => {
+            console.error('Failed to copy links: ', err);
+            alert('Could not copy links to clipboard.');
+        });
+    }
+  }, [filteredStreamers, liveStreamersInFilter]);
+  
+  const copyButtonText = liveStreamersInFilter.length > 0 ? t('copyLiveLinks') : t('copyProfileLinks');
 
   return (
     <div className="min-h-screen w-full text-black/90 transition-colors duration-300 dark:text-white/90">
@@ -225,8 +265,8 @@ const App: React.FC = () => {
             {t('liveStreams')}
           </h2>
 
-          <div className="w-full max-w-4xl mx-auto mt-6 flex flex-col sm:flex-row items-center gap-4">
-            <div className="relative w-full sm:w-1/3">
+          <div className="w-full max-w-6xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-center gap-4">
+            <div className="relative w-full">
               <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
                 <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -241,14 +281,33 @@ const App: React.FC = () => {
                 aria-label={t('searchStreamer')}
               />
             </div>
-            <div className="w-full sm:w-1/3">
+            <div className="w-full">
                <TagFilter
                  allTags={allTags}
                  selectedTags={selectedTags}
                  onSelectedTagsChange={setSelectedTags}
                />
             </div>
-             <div className="relative w-full sm:w-1/3">
+            <div className="relative w-full">
+                <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none disabled:opacity-50"
+                    aria-label={t('filterByCategory')}
+                    disabled={allCategories.length === 0}
+                >
+                    <option value="">{t('allCategories')}</option>
+                    {allCategories.map(category => (
+                        <option key={category} value={category}>{category}</option>
+                    ))}
+                </select>
+                <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </span>
+            </div>
+             <div className="relative w-full">
                 <select
                     value={sortOption}
                     onChange={(e) => setSortOption(e.target.value as 'status' | 'viewers_desc')}
@@ -273,6 +332,31 @@ const App: React.FC = () => {
           )}
         </header>
 
+        {streamerData && filteredStreamers.length > 0 && (
+            <div className="flex justify-center mb-6 -mt-6">
+                <button
+                    onClick={handleCopyLinks}
+                    className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+                >
+                    {isLinksCopied ? (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>{t('copied')}</span>
+                        </>
+                    ) : (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            <span>{copyButtonText}</span>
+                        </>
+                    )}
+                </button>
+            </div>
+        )}
+
         {error && (
           <div className="text-center bg-red-500/20 text-red-300 p-4 rounded-lg mb-8">
             <p><strong>{t('apiErrorTitle')}</strong> {error}</p>
@@ -294,7 +378,7 @@ const App: React.FC = () => {
                 />
               ))}
             </main>
-            {filteredStreamers.length === 0 && (searchQuery || selectedTags.length > 0) && (
+            {filteredStreamers.length === 0 && (searchQuery || selectedTags.length > 0 || selectedCategory) && (
               <div className="text-center py-16 text-black/80 dark:text-white/80">
                 <h3 className="text-2xl font-bold">{t('noStreamersFoundTitle')}</h3>
                 <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noStreamersFoundBody')}</p>
