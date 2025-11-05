@@ -8,6 +8,9 @@ import { TagFilter } from './components/TagFilter';
 import { useLocalization } from './hooks/useLocalization';
 import { requestNotificationPermission, registerServiceWorker, showLiveNotification } from './utils/notificationManager';
 import { StreamerModal } from './StreamerModal';
+import { quranicVerses } from './data/quranicVerses';
+import type { QuranicVerse as VerseType } from './data/quranicVerses';
+import { QuranicVerse } from './components/QuranicVerse';
 
 // LanguageToggle Component
 const LanguageToggle: React.FC = () => {
@@ -140,12 +143,16 @@ const App: React.FC = () => {
   const [sortOption, setSortOption] = useState<'status' | 'viewers_desc' | 'live_duration_desc' | 'last_seen_desc'>('status');
   const [selectedStreamer, setSelectedStreamer] = useState<Channel | null>(null);
   const [isLinksCopied, setIsLinksCopied] = useState(false);
+  const [randomVerse, setRandomVerse] = useState<VerseType | null>(null);
   
   // Notification State
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | null>(null);
   const [streamerNotificationSettings, setStreamerNotificationSettings] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
+    // Pick a random verse on mount
+    setRandomVerse(quranicVerses[Math.floor(Math.random() * quranicVerses.length)]);
+
     setNotificationPermission(typeof Notification !== 'undefined' ? Notification.permission : null);
     registerServiceWorker();
     const settings = JSON.parse(localStorage.getItem('streamerNotifications') || '{}');
@@ -370,6 +377,14 @@ const App: React.FC = () => {
             {t('liveStreams')}
           </h2>
 
+          {randomVerse && <QuranicVerse verse={randomVerse} />}
+
+          {lastUpdated && (
+             <p className="text-sm text-black/60 dark:text-white/60 mt-4">
+               {t('lastUpdated', { time: lastUpdated.toLocaleTimeString() })}
+             </p>
+          )}
+
           <div className="w-full max-w-6xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-center gap-4">
             <div className="relative w-full">
               <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
@@ -412,12 +427,6 @@ const App: React.FC = () => {
                 </span>
             </div>
           </div>
-
-          {lastUpdated && (
-             <p className="text-sm text-black/60 dark:text-white/60 mt-4">
-               {t('lastUpdated', { time: lastUpdated.toLocaleTimeString() })}
-             </p>
-          )}
         </header>
 
         {streamerData && filteredStreamers.length > 0 && (

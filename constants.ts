@@ -7,6 +7,8 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'lMeshari4', tags: ['CIA', 'CIA Leaders', 'DA Commander'], character: 'Michael Conner' },
   { username: 'tmnaa', tags: ['CIA', 'DO Deputy'], character: 'Abdullah Alshmmari' },
   { username: 'RpWy', tags: ['CIA', 'DO'], character: 'Abdullah Khalid' },
+  { username: 'Teller', tags: ['CIA', 'CIA Leaders'], character: 'Agent Omega' },
+  { username: 'oFlag', tags: ['CIA', 'CIA Doctors'], character: 'Dexter Morgan' },
   { username: 'AbuSwe7l', tags: ['CIA', 'ALPHA Son'], character: 'Rick Mahon' },
   { username: 'IC4C', tags: ['CIA', 'CIA Leaders'], character: 'Saif Alansary' },
   { username: 'Ab2dy', tags: ['CIA', 'DO'], character: 'Abdullah Abd Al-Aziz' },
