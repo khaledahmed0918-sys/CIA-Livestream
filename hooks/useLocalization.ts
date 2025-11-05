@@ -16,7 +16,6 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     return (localStorage.getItem('language') as Language) || 'en';
   });
   const [translations, setTranslations] = useState<{ [key in Language]?: Translations }>({});
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -27,7 +26,6 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   useEffect(() => {
     const fetchTranslations = async () => {
-        setLoading(true);
         try {
             const [enResponse, arResponse] = await Promise.all([
                 fetch('/locales/en.json'),
@@ -43,8 +41,6 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
             console.error("Failed to fetch translations:", error);
             // Set empty translations to avoid breaking the app
             setTranslations({ en: {}, ar: {} });
-        } finally {
-            setLoading(false);
         }
     };
     fetchTranslations();
@@ -69,10 +65,6 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
     return translation;
   }, [language, translations]);
-
-  if (loading) {
-    return null; // Or render a loading indicator
-  }
 
   return React.createElement(
     LocalizationContext.Provider,
