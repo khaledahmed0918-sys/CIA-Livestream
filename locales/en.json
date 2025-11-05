@@ -7,8 +7,6 @@
   "sortBy": "Sort by",
   "sortByStatus": "Status (Live First)",
   "viewersHighToLow": "Viewers (High to Low)",
-  "sortByLiveDuration": "Live Duration (High to Low)",
-  "sortByLastSeen": "Last Seen (Recent First)",
   "lastUpdated": "Last Updated: {{time}}",
   "apiErrorTitle": "API Error:",
   "apiErrorBody": "Displaying last known data. Will retry automatically.",
@@ -16,9 +14,6 @@
   "noStreamersFoundBody": "Your filter criteria did not match any streamers.",
   "live": "Live",
   "offline": "Offline",
-  "liveCount": "{{count}} Live",
-  "offlineCount": "{{count}} Offline",
-  "inactiveCount": "{{count}} Inactive (1w+)",
   "liveFor": "Live for {{time}}",
   "followers": "followers",
   "stale": "Stale",
@@ -61,8 +56,5 @@
   "socialInstagram": "Instagram",
   "socialDiscord": "Discord",
   "isNowLive": "{{name}} is now live!",
-  "failedToLoadData": "Failed to load data",
-  "footerTitle": "Credits For",
-  "copyDiscordId": "Copy Discord ID",
-  "discordIdCopied": "Discord ID Copied!"
+  "failedToLoadData": "Failed to load data"
 }

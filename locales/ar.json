@@ -7,8 +7,6 @@
   "sortBy": "ترتيب حسب",
   "sortByStatus": "الحالة (المباشر أولاً)",
   "viewersHighToLow": "المشاهدون (من الأعلى إلى الأقل)",
-  "sortByLiveDuration": "مدة البث (من الأطول للأقصر)",
-  "sortByLastSeen": "آخر ظهور (الأحدث أولاً)",
   "lastUpdated": "آخر تحديث: {{time}}",
   "apiErrorTitle": "خطأ في الواجهة البرمجية:",
   "apiErrorBody": "يتم عرض آخر البيانات المعروفة. ستتم إعادة المحاولة تلقائيًا.",
@@ -16,9 +14,6 @@
   "noStreamersFoundBody": "لم تتطابق معايير التصفية مع أي ستريمر.",
   "live": "مباشر",
   "offline": "غير متصل",
-  "liveCount": "{{count}} مباشر",
-  "offlineCount": "{{count}} غير متصل",
-  "inactiveCount": "{{count}} غير نشط (أسبوع+)",
   "liveFor": "مباشر لمدة {{time}}",
   "followers": "متابع",
   "stale": "قديم",
@@ -61,8 +56,5 @@
   "socialInstagram": "انستغرام",
   "socialDiscord": "ديسكورد",
   "isNowLive": "{{name}} بدأ البث الآن!",
-  "failedToLoadData": "فشل تحميل البيانات",
-  "footerTitle": "شكر خاص لـ",
-  "copyDiscordId": "انسخ معرف الديسكورد",
-  "discordIdCopied": "تم نسخ المعرف!"
+  "failedToLoadData": "فشل تحميل البيانات"
 }

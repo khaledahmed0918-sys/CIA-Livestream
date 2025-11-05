@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import type { Channel } from '../types';
-import { useLocalization } from '../hooks/useLocalization';
-import { humanizeTime, formatFullDateTime } from '../utils/time';
+import type { Channel } from './types';
+import { useLocalization } from './hooks/useLocalization';
+import { humanizeTime, formatFullDateTime } from './utils/time';
 
 interface StreamerCardProps {
   streamer: Channel;

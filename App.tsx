@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { fetchChannelStatuses } from './services/kickService';
 import type { KickApiResponse, Channel } from './types';
 import { KICK_STREAMERS, POLLING_INTERVAL_SECONDS } from './constants';
-import { StreamerCard } from './components/StreamerCard';
+import { StreamerCard } from './StreamerCard';
 import { ThemeToggle } from './components/ThemeToggle';
 import { TagFilter } from './components/TagFilter';
 import { useLocalization } from './hooks/useLocalization';
@@ -57,6 +57,78 @@ const NotificationsToggle: React.FC<{enabled: boolean, onToggle: (e: boolean) =>
   );
 };
 
+const Footer: React.FC = () => {
+    const { t } = useLocalization();
+    const [copiedDiscordId, setCopiedDiscordId] = useState<string | null>(null);
+
+    const handleDiscordCopy = (id: string) => {
+        navigator.clipboard.writeText(id).then(() => {
+            setCopiedDiscordId(id);
+            setTimeout(() => setCopiedDiscordId(null), 2000);
+        });
+    };
+    
+    const XIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+    );
+
+    const DiscordIcon = () => (
+        <img 
+            src="https://cdn.discordapp.com/attachments/1370075497559756962/1435636024939249786/x7OHYuiH.png?ex=690cafbd&is=690b5e3d&hm=119deb1d81d1354b8774440577404e23d88c9a2b59626dcd288f80a92e4a2c20&" 
+            alt="Discord Logo" 
+            className="h-5 w-5" 
+        />
+    );
+
+    const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => (
+        <div className="group/tooltip relative">
+            {children}
+            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 scale-0 group-hover/tooltip:scale-100 rounded bg-gray-800 p-2 text-xs text-white transition-all dark:bg-gray-900 w-max max-w-xs text-center z-50">
+                {text}
+            </span>
+        </div>
+    );
+
+    return (
+        <footer className="text-center py-8 text-black/80 dark:text-white/80">
+            <h3 className="text-xl font-semibold mb-6">{t('footerTitle')}</h3>
+            <div className="flex justify-center items-start gap-12 md:gap-24">
+                {/* Mohammed */}
+                <div className="flex flex-col items-center gap-3">
+                    <p className="font-bold text-lg">Mohammed</p>
+                    <div className="flex items-center gap-3">
+                        <Tooltip text={copiedDiscordId === '221.k' ? t('discordIdCopied') : t('copyDiscordId')}>
+                            <button onClick={() => handleDiscordCopy('221.k')} className="p-2 rounded-full bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
+                                <DiscordIcon />
+                            </button>
+                        </Tooltip>
+                        <a href="https://x.com/i_MohammedQht" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 transition-colors" aria-label="Mohammed's Twitter">
+                            <XIcon />
+                        </a>
+                    </div>
+                </div>
+                {/* Osama */}
+                <div className="flex flex-col items-center gap-3">
+                    <p className="font-bold text-lg">Osama</p>
+                    <div className="flex items-center gap-3">
+                         <Tooltip text={copiedDiscordId === 'alwa2' ? t('discordIdCopied') : t('copyDiscordId')}>
+                            <button onClick={() => handleDiscordCopy('alwa2')} className="p-2 rounded-full bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
+                                <DiscordIcon />
+                            </button>
+                        </Tooltip>
+                        <a href="https://x.com/alwa28" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 transition-colors" aria-label="Osama's Twitter">
+                            <XIcon />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    );
+};
+
+
 const App: React.FC = () => {
   const { t } = useLocalization();
   const [streamerData, setStreamerData] = useState<KickApiResponse | null>(null);
@@ -65,8 +137,7 @@ const App: React.FC = () => {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [sortOption, setSortOption] = useState<'status' | 'viewers_desc'>('status');
+  const [sortOption, setSortOption] = useState<'status' | 'viewers_desc' | 'live_duration_desc' | 'last_seen_desc'>('status');
   const [selectedStreamer, setSelectedStreamer] = useState<Channel | null>(null);
   const [isLinksCopied, setIsLinksCopied] = useState(false);
   
@@ -127,14 +198,6 @@ const App: React.FC = () => {
     return [...new Set(tags)].sort();
   }, []);
 
-  const allCategories = useMemo(() => {
-    if (!streamerData?.data) return [];
-    const categories = streamerData.data
-      .map(streamer => streamer.live_category)
-      .filter((category): category is string => !!category && category.trim() !== '');
-    return [...new Set(categories)].sort();
-  }, [streamerData]);
-
   const fetchData = useCallback(async () => {
     try {
       const data = await fetchChannelStatuses(KICK_STREAMERS);
@@ -172,15 +235,29 @@ const App: React.FC = () => {
     const liveStreamers = streamersToSort.filter(s => s.is_live);
     const offlineStreamers = streamersToSort.filter(s => !s.is_live);
 
-    if (sortOption === 'status') {
-        liveStreamers.sort((a, b) => (b.viewer_count ?? 0) - (a.viewer_count ?? 0));
+    switch (sortOption) {
+      case 'live_duration_desc':
+        liveStreamers.sort((a, b) => {
+          const dateA = a.live_since ? new Date(a.live_since).getTime() : Infinity;
+          const dateB = b.live_since ? new Date(b.live_since).getTime() : Infinity;
+          return dateA - dateB; // Earlier date means longer duration
+        });
         offlineStreamers.sort((a, b) => {
           const dateA = a.last_stream_start_time ? new Date(a.last_stream_start_time).getTime() : 0;
           const dateB = b.last_stream_start_time ? new Date(b.last_stream_start_time).getTime() : 0;
           return dateB - dateA;
         });
         return [...liveStreamers, ...offlineStreamers];
-    } else { // 'viewers_desc'
+
+      case 'last_seen_desc':
+        streamersToSort.sort((a, b) => {
+          const timeA = a.is_live ? Date.now() : (a.last_stream_start_time ? new Date(a.last_stream_start_time).getTime() : 0);
+          const timeB = b.is_live ? Date.now() : (b.last_stream_start_time ? new Date(b.last_stream_start_time).getTime() : 0);
+          return timeB - timeA;
+        });
+        return streamersToSort;
+        
+      case 'viewers_desc':
         streamersToSort.sort((a, b) => {
             if (a.is_live && !b.is_live) return -1;
             if (!a.is_live && b.is_live) return 1;
@@ -188,18 +265,24 @@ const App: React.FC = () => {
               return (b.viewer_count ?? 0) - (a.viewer_count ?? 0);
             }
             return a.username.localeCompare(b.username);
-      });
-      return streamersToSort;
+        });
+        return streamersToSort;
+        
+      case 'status':
+      default:
+        liveStreamers.sort((a, b) => (b.viewer_count ?? 0) - (a.viewer_count ?? 0));
+        offlineStreamers.sort((a, b) => {
+          const dateA = a.last_stream_start_time ? new Date(a.last_stream_start_time).getTime() : 0;
+          const dateB = b.last_stream_start_time ? new Date(b.last_stream_start_time).getTime() : 0;
+          return dateB - dateA;
+        });
+        return [...liveStreamers, ...offlineStreamers];
     }
   }, [streamerData, sortOption]);
 
   const filteredStreamers = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     let streamers = sortedStreamers;
-
-    if (selectedCategory) {
-      streamers = streamers.filter(streamer => streamer.live_category === selectedCategory);
-    }
 
     if (selectedTags.length > 0) {
       streamers = streamers.filter(streamer =>
@@ -218,7 +301,26 @@ const App: React.FC = () => {
     }
     
     return streamers;
-  }, [sortedStreamers, searchQuery, selectedTags, selectedCategory]);
+  }, [sortedStreamers, searchQuery, selectedTags]);
+
+  const liveCount = useMemo(() => filteredStreamers.filter(s => s.is_live).length, [filteredStreamers]);
+  const offlineCount = useMemo(() => filteredStreamers.filter(s => !s.is_live).length, [filteredStreamers]);
+  const inactiveCount = useMemo(() => {
+    const oneWeekAgoTimestamp = new Date().getTime() - (7 * 24 * 60 * 60 * 1000);
+
+    return filteredStreamers.filter(streamer => {
+      if (streamer.is_live || !streamer.last_stream_start_time) {
+        return false;
+      }
+      try {
+        const lastStreamTimestamp = new Date(streamer.last_stream_start_time).getTime();
+        if (isNaN(lastStreamTimestamp)) return false;
+        return lastStreamTimestamp < oneWeekAgoTimestamp;
+      } catch (e) {
+        return false;
+      }
+    }).length;
+  }, [filteredStreamers]);
 
   const liveStreamersInFilter = useMemo(() => filteredStreamers.filter(s => s.is_live), [filteredStreamers]);
 
@@ -268,7 +370,7 @@ const App: React.FC = () => {
             {t('liveStreams')}
           </h2>
 
-          <div className="w-full max-w-6xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-center gap-4">
+          <div className="w-full max-w-6xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-center gap-4">
             <div className="relative w-full">
               <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
                 <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -291,34 +393,17 @@ const App: React.FC = () => {
                  onSelectedTagsChange={setSelectedTags}
                />
             </div>
-            <div className="relative w-full">
-                <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none disabled:opacity-50"
-                    aria-label={t('filterByCategory')}
-                    disabled={allCategories.length === 0}
-                >
-                    <option value="">{t('allCategories')}</option>
-                    {allCategories.map(category => (
-                        <option key={category} value={category}>{category}</option>
-                    ))}
-                </select>
-                <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
-                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </span>
-            </div>
              <div className="relative w-full">
                 <select
                     value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value as 'status' | 'viewers_desc')}
+                    onChange={(e) => setSortOption(e.target.value as 'status' | 'viewers_desc' | 'live_duration_desc' | 'last_seen_desc')}
                     className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none"
                     aria-label={t('sortBy')}
                 >
                     <option value="status">{t('sortByStatus')}</option>
                     <option value="viewers_desc">{t('viewersHighToLow')}</option>
+                    <option value="live_duration_desc">{t('sortByLiveDuration')}</option>
+                    <option value="last_seen_desc">{t('sortByLastSeen')}</option>
                 </select>
                 <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
                     <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -336,7 +421,7 @@ const App: React.FC = () => {
         </header>
 
         {streamerData && filteredStreamers.length > 0 && (
-            <div className="flex justify-center mb-6 -mt-6">
+            <div className="flex flex-col items-center gap-4 mb-6 -mt-6">
                 <button
                     onClick={handleCopyLinks}
                     className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
@@ -357,6 +442,20 @@ const App: React.FC = () => {
                         </>
                     )}
                 </button>
+                 <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm text-black/80 dark:text-white/80 mt-4">
+                  <span className="flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full bg-green-400"></span>
+                    <span>{t('liveCount', { count: liveCount })}</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                    <span>{t('offlineCount', { count: offlineCount })}</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full bg-gray-500"></span>
+                    <span>{t('inactiveCount', { count: inactiveCount })}</span>
+                  </span>
+                </div>
             </div>
         )}
 
@@ -381,7 +480,7 @@ const App: React.FC = () => {
                 />
               ))}
             </main>
-            {filteredStreamers.length === 0 && (searchQuery || selectedTags.length > 0 || selectedCategory) && (
+            {filteredStreamers.length === 0 && (searchQuery || selectedTags.length > 0) && (
               <div className="text-center py-16 text-black/80 dark:text-white/80">
                 <h3 className="text-2xl font-bold">{t('noStreamersFoundTitle')}</h3>
                 <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noStreamersFoundBody')}</p>
@@ -408,6 +507,7 @@ const App: React.FC = () => {
         )}
       </div>
       <StreamerModal streamer={selectedStreamer} onClose={() => setSelectedStreamer(null)} />
+      <Footer />
     </div>
   );
 };
