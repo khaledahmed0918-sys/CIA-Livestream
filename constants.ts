@@ -1,9 +1,9 @@
 
 export const KICK_STREAMERS: { username: string; tags: string[]; character: string }[] = [
   { username: 'SXB', tags: ['CIA', 'CIA Leaders', 'DO Commander', 'DO'], character: 'Abdulsamad Alqurashi' },
-  { username: 'https://kick.com/ysmo', tags: ['CIA', 'CIA Deputy'], character: 'Agent X' },
-  { username: 'Osamah', tags: ['CIA', 'CIA Leader'], character: 'Alexander Mahon' },
-  { username: 'MOLO101', tags: ['CIA', 'CIA Doctor', 'DS Commander', 'DS'], character: 'Dr.Anderw' },
+  { username: 'https://kick.com/ysmo', tags: ['CIA', 'CIA Deputy', 'CIA Leaders'], character: 'Agent X' },
+  { username: 'Osamah', tags: ['CIA', 'CIA Director'], character: 'Alexander Mahon' },
+  { username: 'MOLO101', tags: ['CIA', 'CIA Leaders', 'CIA Doctor', 'DS Commander', 'DS'], character: 'Dr.Anderw' },
   { username: 'lMeshari4', tags: ['CIA', 'CIA Leaders', 'DA Commander'], character: 'Michael Conner' },
   { username: 'tmnaa', tags: ['CIA', 'DO Deputy'], character: 'Abdullah Alshmmari' },
   { username: 'RpWy', tags: ['CIA', 'DO'], character: 'Abdullah Khalid' },
@@ -13,7 +13,7 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'IC4C', tags: ['Respect', 'CIA', 'CIA Leaders'], character: 'Saif Alansary' },
   { username: 'Ab2dy', tags: ['CIA', 'DO'], character: 'Abdullah Abd Al-Aziz' },
   { username: 'brof2', tags: ['CIA', 'CIA Doctor', 'DO'], character: 'Brof' },
-  { username: 'IB6h', tags: ['Respect', 'CIA', 'Executive Director'], character: 'Damien Silver Beta' },
+  { username: 'IB6h', tags: ['Respect', 'CIA', 'CIA Leaders', 'Executive Director'], character: 'Damien Silver Beta' },
   { username: 'PROMT3B', tags: ['CIA', 'Death Battelion Deputy'], character: 'DON' },
   { username: 'Fahad', tags: ['CIA', 'DO'], character: 'Fahad Saad' },
   { username: 'Muvxn', tags: ['CIA', 'CIA Pilots', 'DO'], character: 'Musab Al Sultan' },
@@ -35,7 +35,7 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'vSaleh', tags: ['CIA', 'DO'], character: 'Saleh Alenzi "Agent-Ninja"' },
   { username: 'INQ', tags: ['CIA', 'CIA Leaders'], character: 'James Arthur' },
   { username: 'mesh7', tags: ['CIA', 'DO'], character: 'Meshal Salman' },
-  { username: 'Sult', tags: ['CIA', 'DO'], character: 'Sulatn Alotaibi | Zolo' },
+  { username: 'Sult', tags: ['CIA', 'CIA Leaders', 'DO'], character: 'Sulatn Alotaibi | Zolo' },
   { username: 'itsOG', tags: ['Agent'], character: 'Talq AlSbi3i' },
   { username: 'MTNEWS', tags: ['Agent'], character: '3amar Bin Abdulhamid' },
   { username: 'xMusaad', tags: ['Agent'], character: 'Musa3d' },
@@ -51,7 +51,7 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'tqrolld', tags: ['CIA', 'DS'], character: 'Victor Rundn' },
   { username: 'Fwaz', tags: ['CIA', 'CIA Leaders', 'DOU Commander'], character: 'Fwaz Jnaza' },
   { username: 'D7MX', tags: ['CIA', 'CIA Leaders', 'Executive Director'], character: 'Echo' },
-  { username: 'Abdullahx', tags: ['CIA', 'CIA Deputy'], character: 'Bravo' },
+  { username: 'Abdullahx', tags: ['CIA', 'CIA Leaders', 'CIA Deputy'], character: 'Bravo' },
 ];
 
 export const POLLING_INTERVAL_SECONDS: number = 90;
