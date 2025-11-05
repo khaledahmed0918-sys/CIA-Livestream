@@ -27,13 +27,14 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'itsOG', tags: ['Agent'], character: 'Talq AlSbi3i' },
   { username: 'MTNEWS', tags: ['Agent'], character: '3amar Bin Abdulhamid' },
   { username: 'xMusaad', tags: ['Agent'], character: 'Musa3d' },
-  { username: 'odn35', tags: ['CIA', 'DS Deputy', 'DS'], character: 'Jaster' },
+  { username: 'odn35', tags: ['CIA', 'DS Deputy', 'DS'], character: 'Benny Surge' },
   { username: 'VMalik', tags: ['CIA', 'DS Deputy', 'DS'], character: 'Munir Almalky' },
   { username: 'iABS', tags: ['CIA'], character: 'Aba Alhreth' },
-  { username: 'abu_saad3', tags: ['CIA', 'DS'], character: 'Anonymous' },
+  { username: 'abu_saad3', tags: ['CIA', 'DS'], character: 'Ali Bin Saad' },
   { username: 'craed', tags: ['CIA', 'DS'], character: 'Wiliam Coby' },
+  { username: '71sky', tags: ['CIA', 'DS'], character: 'Skylar Scott' },
   { username: 'sniperxzaid', tags: ['CIA', 'DS'], character: 'Zaid Muhammad' },
-  { username: '0xsultan', tags: ['CIA', 'DS'], character: 'Anonymous' },
+  { username: '0xsultan', tags: ['CIA', 'DS'], character: 'Lysander Restova' },
   { username: 'tqrolld', tags: ['CIA', 'DS'], character: 'Victor Rundn' },
 ];
 
