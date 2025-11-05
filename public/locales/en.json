@@ -1,6 +1,14 @@
 {
   "liveStreams": "Live Streams",
+  "scheduleStreams": "Schedule Streams",
+  "noSchedulesTitle": "No Scheduled Streams",
+  "noSchedulesBody": "There are no upcoming scheduled streams at the moment.",
+  "notes": "Notes",
+  "scheduled": "Scheduled",
+  "liveSoon": "Live Soon",
+  "liveIn": "Live in:",
   "searchStreamer": "Search streamer...",
+  "searchSchedules": "Search by name, notes, character...",
   "filterByTags": "Filter by tags...",
   "tagsSelected": "{{count}} tags selected",
   "searchTags": "Search tags...",
@@ -9,6 +17,8 @@
   "viewersHighToLow": "Viewers (High to Low)",
   "sortByLiveDuration": "Live Duration (High to Low)",
   "sortByLastSeen": "Last Seen (Recent First)",
+  "sortBySoonest": "Soonest First",
+  "sortByStatusScheduled": "Status (Live Soon First)",
   "lastUpdated": "Last Updated: {{time}}",
   "apiErrorTitle": "API Error:",
   "apiErrorBody": "Displaying last known data. Will retry automatically.",
@@ -19,6 +29,8 @@
   "liveCount": "{{count}} Live",
   "offlineCount": "{{count}} Offline",
   "inactiveCount": "{{count}} Inactive (1w+)",
+  "liveSoonCount": "{{count}} Live Soon",
+  "scheduledCount": "{{count}} Scheduled",
   "liveFor": "Live for {{time}}",
   "followers": "followers",
   "stale": "Stale",
@@ -49,6 +61,7 @@
   "allCategories": "All Categories",
   "copyLiveLinks": "Copy Live Links",
   "copyProfileLinks": "Copy Profile Links",
+  "copyLiveSoonLinks": "Copy Live Soon Links",
   "streamTitle": "Stream Title",
   "switchToLang": "Switch to {{lang}}",
   "lang_ar": "Arabic",
@@ -64,5 +77,6 @@
   "failedToLoadData": "Failed to load data",
   "footerTitle": "Credits For",
   "copyDiscordId": "Copy Discord ID",
-  "discordIdCopied": "Discord ID Copied!"
+  "discordIdCopied": "Discord ID Copied!",
+  "retry": "Retry"
 }

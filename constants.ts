@@ -21,7 +21,7 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'Azeez', tags: ['CIA', 'CIA Leaders', 'Flight Field Commander'], character: 'Eziar Qab' },
   { username: 'xEid', tags: ['CIA', 'CIA Leaders','Death Battelion Commanders', 'DO'], character: 'Bob Marley | Rambo' },
   { username: 'Firas', tags: ['CIA', 'DO'], character: 'Snop Marley' },
-  { username: '7omah', tags: ['CIA', 'CIA Leaders', 'CIA Pilots', 'DI Deputy'], character: 'Merf' },
+  { username: '7omah', tags: ['CIA', 'CIA Leaders', 'CIA Pilots', 'DI Deputy'], character: 'Murph' },
   { username: 'Zeeyadx', tags: ['CIA', 'DO'], character: 'Agent Hunter' },
   { username: 'xlxwi', tags: ['CIA', 'DO'], character: 'Ali Abdullah' },
   { username: 'Dark12', tags: ['CIA', 'DA'], character: 'Alex Michael' },

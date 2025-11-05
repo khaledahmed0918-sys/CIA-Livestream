@@ -25,3 +25,11 @@ export interface KickApiResponse {
   checked_at: string; // ISO8601
   data: Channel[];
 }
+
+export interface ScheduledStream {
+  id: string;
+  streamerUsername: string;
+  startTime: string; // ISO8601
+  notes: string;
+  characters?: string[];
+}
