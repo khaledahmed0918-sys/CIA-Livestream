@@ -20,6 +20,7 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: '7omah', tags: ['CIA', 'CIA Pilot', 'DI Deputy'], character: 'Merf' },
   { username: 'Zeeyadx', tags: ['CIA', 'DO'], character: 'Zeeyad Alshmmari' },
   { username: 'Vilon', tags: ['CIA', 'DO'], character: 'Akai' },
+  { username: 'v7so', tags: ['CIA', 'Border Breaking Battalion'], character: 'Paul' },
   { username: 's6mito', tags: ['CIA', 'DO'], character: 'Satam Al Otaibi' },
   { username: 'INQ', tags: ['CIA', 'CIA Leaders'], character: 'James Arthur' },
   { username: 'mesh7', tags: ['CIA', 'DO'], character: 'Meshal Salman' },
@@ -36,6 +37,8 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: 'sniperxzaid', tags: ['CIA', 'DS'], character: 'Zaid Muhammad' },
   { username: '0xsultan', tags: ['CIA', 'DS'], character: 'Lysander Restova' },
   { username: 'tqrolld', tags: ['CIA', 'DS'], character: 'Victor Rundn' },
+  { username: 'Fwaz', tags: ['CIA', 'CIA Leaders'], character: 'Fwaz Jnaza' },
+  { username: 'D7MX', tags: ['CIA', 'CIA Leaders', 'Executive Director'], character: 'Echo' },
 ];
 
 export const POLLING_INTERVAL_SECONDS: number = 90;
