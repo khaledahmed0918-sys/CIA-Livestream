@@ -387,12 +387,9 @@ const App: React.FC = () => {
             <ThemeToggle />
           </div>
           <img 
-            src="https://cdn.discordapp.com/attachments/1370075497559756962/1435254475970314311/00WZrbng.png?ex=690b4c64&is=6909fae4&hm=edacf00cf646f04b92089cea9f13160f87d13891b0590bed4b8aa508f25174d4&$0" 
+            src="./cia-logo.png" 
             alt="CIA Logo" 
             className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg mb-4 transform -translate-x-3"
-            onError={(e) => {
-               e.currentTarget.src = "/cia-logo.png"; // صورة موجودة عندك بالسيرفر
-              }}
              />
           <h1 className="text-5xl font-bold tracking-[0.5em] text-black dark:text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
             C I A
