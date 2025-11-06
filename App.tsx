@@ -387,7 +387,7 @@ const App: React.FC = () => {
             <ThemeToggle />
           </div>
           <img 
-            src="/cia-logo.png" 
+            src="https://i.postimg.cc/g2mhxC8q/vas-AGbotko-OBs.png" 
             alt="CIA Logo" 
             className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg mb-4 transform -translate-x-3"
              />
