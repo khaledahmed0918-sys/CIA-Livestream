@@ -42,7 +42,7 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
   { username: '1RWi', tags: ['CIA', 'Death Battelion Deputy Commanders'], character: 'Ms.Caplin' },
   { username: 'odn35', tags: ['CIA', 'CIA Doctor', 'DS Deputy', 'DS'], character: 'Benny Surge "Agent-Gaster"' },
   { username: 'VMalik', tags: ['CIA', 'DS'], character: 'Munir Almalky' },
-  { username: 'iABS', tags: ['CIA', 'Border Breaking Battalion'], character: 'Aba Alhreth' },
+  { username: 'iABS', tags: ['CIA', 'Border Breaking Battalion'], character: 'Aba Alhareth' },
   { username: 'abu_saad3', tags: ['CIA', 'DS'], character: 'Ali Bin Saad' },
   { username: 'cRaed', tags: ['CIA', 'DS'], character: 'Wiliam Coby' },
   { username: '71sky', tags: ['CIA', 'DS'], character: 'Skylar Scott' },
