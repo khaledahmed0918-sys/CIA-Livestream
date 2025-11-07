@@ -86,7 +86,14 @@
   "sidebarThanks": "Thanks For Visiting Us",
   "clearAll": "Clear All",
   "noTagsFound": "No tags found",
-  "applyTitle": "Apply For CIA in MTRP Server",
   "applyButton": "Apply",
-  "sidebarApply": "Apply for CIA"
+  "sidebarApply": "Apply (Out of RP)",
+  "applyTitleOutOfRp": "Apply For CIA out of MTRP",
+  "noteTitle": "Note",
+  "noteText": "This section is specially for those whose job will be out of RP (Server).",
+  "targetedExperiencesTitle": "Targeted Experiences",
+  "experienceTag1": "Writing Reports (Writing and Designing a Folder or Paper Pages About Field Reports)",
+  "experienceTag2": "Writes (Analysis, Future Predictions, Threads, etc.)",
+  "experienceTag3": "Editing Photos, Drawing or Posters",
+  "experienceTag4": "Videos Editor"
 }

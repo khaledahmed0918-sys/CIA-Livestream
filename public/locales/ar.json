@@ -86,7 +86,14 @@
   "sidebarThanks": "شكرًا لزيارتكم",
   "clearAll": "مسح الكل",
   "noTagsFound": "لم يتم العثور على علامات",
-  "applyTitle": "قدم للـ CIA في سيرفر MTRP",
   "applyButton": "تقديم",
-  "sidebarApply": "التقديم للـ CIA"
+  "sidebarApply": "التقديم (خارج الآر بي)",
+  "applyTitleOutOfRp": "التقديم للـ CIA خارج MTRP",
+  "noteTitle": "ملاحظة",
+  "noteText": "هذا القسم خاص بالاشخاص الذين سيكون عملهم خارج الـ RP ( السيرفر )",
+  "targetedExperiencesTitle": "الفئات المستهدفة",
+  "experienceTag1": "كتابة التقارير (كتابة وتصميم ملف أو صفحات ورقية حول التقارير الميدانية)",
+  "experienceTag2": "الكتابة ( التحليل, التوقعات المستقبلية, الثريدات الخ..)",
+  "experienceTag3": "تعديل الصور او الرسم او البوسترات",
+  "experienceTag4": "تعديل المقاطع"
 }

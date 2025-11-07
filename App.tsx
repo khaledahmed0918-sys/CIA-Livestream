@@ -65,25 +65,111 @@ const NotificationsToggle: React.FC<{enabled: boolean, onToggle: (e: boolean) =>
 // ApplySection Component
 const ApplySection: React.FC = () => {
     const { t } = useLocalization();
+    const [layoutType] = useState(() => Math.random() < 0.5 ? 'layout1' : 'layout2');
+
+    const experiences = useMemo(() => [
+        { key: 'experienceTag1', text: t('experienceTag1') },
+        { key: 'experienceTag2', text: t('experienceTag2') },
+        { key: 'experienceTag3', text: t('experienceTag3') },
+        { key: 'experienceTag4', text: t('experienceTag4') },
+    ].sort((a, b) => b.text.length - a.text.length), [t]);
+
+    const ExperienceTag: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+        <div className="bg-black/10 dark:bg-white/10 rounded-lg px-4 py-2 text-center font-semibold text-base">
+            {children}
+        </div>
+    );
+    
     return (
         <section id="apply-section" className="container mx-auto px-4 pb-8">
-            <div className="w-full max-w-6xl mx-auto text-center rounded-2xl border border-white/10 bg-white/5 p-8 text-black shadow-lg backdrop-blur-lg transition-all duration-300 ease-in-out hover:shadow-2xl dark:text-white dark:border-white/10 dark:bg-black/20">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-black dark:text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                    {t('applyTitle')}
+            <div className="w-full max-w-6xl mx-auto rounded-2xl border border-white/10 bg-white/5 p-8 text-black shadow-lg backdrop-blur-lg transition-all duration-300 ease-in-out hover:shadow-2xl dark:text-white dark:border-white/10 dark:bg-black/20 overflow-hidden">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-center text-black dark:text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    {t('applyTitleOutOfRp')}
                 </h2>
-                <img 
-                    src="https://i.postimg.cc/g2mhxC8q/vas_AGbotko-OBs.png" 
-                    alt="CIA Logo" 
-                    className="w-32 h-32 rounded-full border-2 border-white/20 shadow-lg mb-8 mx-auto"
-                />
-                <a
-                    href="https://t.co/mAonWGaM6C"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block rounded-xl border border-white/10 bg-white/10 px-8 py-3 text-lg font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50"
-                >
-                    {t('applyButton')}
-                </a>
+
+                {layoutType === 'layout1' ? (
+                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+                        {/* Left Column: Note */}
+                        <div className="flex flex-col text-center lg:text-left rtl:lg:text-right">
+                            <div>
+                                <h3 className="text-3xl font-bold mb-2">{t('noteTitle')}</h3>
+                                <p className="text-lg text-black/80 dark:text-white/80">{t('noteText')}</p>
+                            </div>
+                            <img 
+                                src="https://i.postimg.cc/Ss3Rz0gj/Bs-BKXFTQ.png"
+                                alt="Field Report Example"
+                                className="w-[600px] h-auto max-w-none rounded-xl shadow-lg mt-auto object-cover -translate-x-[75px] -translate-y-[-29px]"
+                            />
+                        </div>
+                        
+                        {/* Center Column: Image and Button */}
+                        <div className="flex flex-col items-center justify-center gap-6 order-first lg:order-none">
+                            <img 
+                                src="https://i.postimg.cc/g2mhxC8q/vas_AGbotko-OBs.png" 
+                                alt="CIA Logo" 
+                                className="w-56 h-56 rounded-full border-2 border-white/20 shadow-lg"
+                            />
+                            <a
+                                href="https://docs.google.com/forms/d/e/1FAIpQLScsGPexod2flMh9GXl8w7FHV44UgNveSmOQjqY6jInTg5Mxtw/viewform$0"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-block w-56 rounded-xl border border-white/10 bg-white/10 px-8 py-3 text-lg font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
+                            >
+                                {t('applyButton')}
+                            </a>
+                        </div>
+                        
+                        {/* Right Column: Targeted Experiences */}
+                        <div className="space-y-6 text-center lg:text-left rtl:lg:text-right">
+                             <div>
+                                <h3 className="text-3xl font-bold mb-4">{t('targetedExperiencesTitle')}</h3>
+                                <div className="space-y-3">
+                                    {experiences.map(exp => (
+                                        <ExperienceTag key={exp.key}>{exp.text}</ExperienceTag>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ) : ( // layoutType === 'layout2'
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        <div className="flex flex-col h-full space-y-6 text-center lg:text-left rtl:lg:text-right">
+                            <div className="space-y-6 flex-grow">
+                                <div>
+                                    <h3 className="text-2xl font-bold mb-2">{t('noteTitle')}</h3>
+                                    <p className="text-black/80 dark:text-white/80">{t('noteText')}</p>
+                                </div>
+                                <hr className="border-t border-white/10" />
+                                <div>
+                                    <h3 className="text-2xl font-bold mb-4">{t('targetedExperiencesTitle')}</h3>
+                                    <div className="space-y-3">
+                                        <ExperienceTag>{experiences[0].text}</ExperienceTag>
+                                        <ExperienceTag>{experiences[1].text}</ExperienceTag>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <ExperienceTag>{experiences[2].text}</ExperienceTag>
+                                            <ExperienceTag>{experiences[3].text}</ExperienceTag>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             <a
+                                href="https://docs.google.com/forms/d/e/1FAIpQLScsGPexod2flMh9GXl8w7FHV44UgNveSmOQjqY6jInTg5Mxtw/viewform$0"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full mt-6 rounded-xl border border-white/10 bg-white/10 px-8 py-3 text-lg font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
+                            >
+                                {t('applyButton')}
+                            </a>
+                        </div>
+                        <div className="flex justify-center items-center order-first lg:order-last">
+                            <img 
+                                src="https://i.postimg.cc/g2mhxC8q/vas_AGbotko-OBs.png" 
+                                alt="CIA Logo" 
+                                className="w-64 h-64 lg:w-full lg:h-auto max-w-sm rounded-full border-2 border-white/20 shadow-lg"
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
         </section>
     );
