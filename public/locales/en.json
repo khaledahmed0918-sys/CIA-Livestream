@@ -85,5 +85,8 @@
   "sidebarCredits": "Credits",
   "sidebarThanks": "Thanks For Visiting Us",
   "clearAll": "Clear All",
-  "noTagsFound": "No tags found"
+  "noTagsFound": "No tags found",
+  "applyTitle": "Apply For CIA in MTRP Server",
+  "applyButton": "Apply",
+  "sidebarApply": "Apply for CIA"
 }

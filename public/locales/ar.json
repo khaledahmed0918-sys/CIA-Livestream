@@ -85,5 +85,8 @@
   "sidebarCredits": "شكر خاص",
   "sidebarThanks": "شكرًا لزيارتكم",
   "clearAll": "مسح الكل",
-  "noTagsFound": "لم يتم العثور على علامات"
+  "noTagsFound": "لم يتم العثور على علامات",
+  "applyTitle": "قدم للـ CIA في سيرفر MTRP",
+  "applyButton": "تقديم",
+  "sidebarApply": "التقديم للـ CIA"
 }

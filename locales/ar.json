@@ -56,5 +56,8 @@
   "socialInstagram": "انستغرام",
   "socialDiscord": "ديسكورد",
   "isNowLive": "{{name}} بدأ البث الآن!",
-  "failedToLoadData": "فشل تحميل البيانات"
+  "failedToLoadData": "فشل تحميل البيانات",
+  "applyTitle": "قدم للـ CIA في سيرفر MTRP",
+  "applyButton": "تقديم",
+  "sidebarApply": "التقديم للـ CIA"
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { fetchChannelStatuses } from './services/kickService';
 import type { KickApiResponse, Channel } from './types';
-import { KICK_STREAMERS, POLLING_INTERVAL_SECONDS } from './constants';
+import { KICK_STREAMERS, POLLING_INTERVAL_SECONDS, ENABLE_APPLY_SECTION } from './constants';
 import { StreamerCard } from './StreamerCard';
 import { ThemeToggle } from './components/ThemeToggle';
 import { TagFilter } from './components/TagFilter';
@@ -61,6 +61,34 @@ const NotificationsToggle: React.FC<{enabled: boolean, onToggle: (e: boolean) =>
     </div>
   );
 };
+
+// ApplySection Component
+const ApplySection: React.FC = () => {
+    const { t } = useLocalization();
+    return (
+        <section id="apply-section" className="container mx-auto px-4 pb-8">
+            <div className="w-full max-w-6xl mx-auto text-center rounded-2xl border border-white/10 bg-white/5 p-8 text-black shadow-lg backdrop-blur-lg transition-all duration-300 ease-in-out hover:shadow-2xl dark:text-white dark:border-white/10 dark:bg-black/20">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-black dark:text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    {t('applyTitle')}
+                </h2>
+                <img 
+                    src="https://i.postimg.cc/g2mhxC8q/vas_AGbotko-OBs.png" 
+                    alt="CIA Logo" 
+                    className="w-32 h-32 rounded-full border-2 border-white/20 shadow-lg mb-8 mx-auto"
+                />
+                <a
+                    href="https://t.co/mAonWGaM6C"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block rounded-xl border border-white/10 bg-white/10 px-8 py-3 text-lg font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50"
+                >
+                    {t('applyButton')}
+                </a>
+            </div>
+        </section>
+    );
+};
+
 
 const Footer: React.FC = () => {
     const { t } = useLocalization();
@@ -409,16 +437,15 @@ const App: React.FC = () => {
     setScheduleStats(stats);
   }, []);
   
-  const handleSidebarNavigate = (section: 'live' | 'scheduled' | 'credits') => {
-    if (section === view) {
-        // If already on the view, just close sidebar.
-        // Or if it's credits, scroll.
-    } else if (section !== 'credits') {
-        toggleView();
-    }
-    
-    if (section === 'credits') {
+  const handleSidebarNavigate = (section: 'live' | 'scheduled' | 'credits' | 'apply') => {
+    if (section === 'live' || section === 'scheduled') {
+        if (view !== section) {
+            toggleView();
+        }
+    } else if (section === 'credits') {
       document.getElementById('credits-footer')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (section === 'apply') {
+        document.getElementById('apply-section')?.scrollIntoView({ behavior: 'smooth' });
     }
     
     setIsSidebarOpen(false);
@@ -433,7 +460,13 @@ const App: React.FC = () => {
         className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setIsSidebarOpen(false)}
       ></div>
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onNavigate={handleSidebarNavigate} activeView={view} />
+      <Sidebar 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+        onNavigate={handleSidebarNavigate} 
+        activeView={view} 
+        showApplyLink={ENABLE_APPLY_SECTION}
+      />
 
       <div className="container mx-auto px-4 py-8">
         <header className="flex flex-col items-center mb-8 relative">
@@ -647,6 +680,7 @@ const App: React.FC = () => {
         </div>
       </div>
       <StreamerModal streamer={selectedStreamer} onClose={() => setSelectedStreamer(null)} />
+      {ENABLE_APPLY_SECTION && <ApplySection />}
       <Footer />
     </div>
   );

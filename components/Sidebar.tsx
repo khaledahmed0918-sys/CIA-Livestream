@@ -4,11 +4,12 @@ import { useLocalization } from '../hooks/useLocalization';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigate: (section: 'live' | 'scheduled' | 'credits') => void;
+  onNavigate: (section: 'live' | 'scheduled' | 'credits' | 'apply') => void;
   activeView: 'live' | 'scheduled';
+  showApplyLink: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, activeView }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, activeView, showApplyLink }) => {
   const { t } = useLocalization();
 
   return (
@@ -58,6 +59,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
                 {t('sidebarScheduleStreams')}
               </button>
             </li>
+            {showApplyLink && (
+               <li>
+                <button
+                  onClick={() => onNavigate('apply')}
+                  className="w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                >
+                  {t('sidebarApply')}
+                </button>
+              </li>
+            )}
             <li>
               <button
                 onClick={() => onNavigate('credits')}

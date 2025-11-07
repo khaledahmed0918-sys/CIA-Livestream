@@ -56,5 +56,8 @@
   "socialInstagram": "Instagram",
   "socialDiscord": "Discord",
   "isNowLive": "{{name}} is now live!",
-  "failedToLoadData": "Failed to load data"
+  "failedToLoadData": "Failed to load data",
+  "applyTitle": "Apply For CIA in MTRP Server",
+  "applyButton": "Apply",
+  "sidebarApply": "Apply for CIA"
 }
