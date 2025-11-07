@@ -109,7 +109,7 @@ const Footer: React.FC = () => {
 
     const DiscordIcon = () => (
         <img 
-            src="https://cdn.discordapp.com/attachments/1370075497559756962/1435636024939249786/x7OHYuiH.png?ex=690cafbd&is=690b5e3d&hm=119deb1d81d1354b8774440577404e23d88c9a2b59626dcd288f80a92e4a2c20&" 
+            src="https://i.postimg.cc/nrNpXdWK/IMG-7921.webp" 
             alt="Discord Logo" 
             className="h-5 w-5" 
         />
