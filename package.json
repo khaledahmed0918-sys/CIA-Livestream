@@ -11,6 +11,7 @@
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
+    "patch-package": "^8.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
