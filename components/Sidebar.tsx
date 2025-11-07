@@ -4,12 +4,13 @@ import { useLocalization } from '../hooks/useLocalization';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigate: (section: 'live' | 'scheduled' | 'credits' | 'apply') => void;
-  activeView: 'live' | 'scheduled';
+  onNavigate: (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites') => void;
+  activeView: 'live' | 'scheduled' | 'favorites';
   showApplyLink: boolean;
+  hasFavorites: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, activeView, showApplyLink }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, activeView, showApplyLink, hasFavorites }) => {
   const { t } = useLocalization();
 
   return (
@@ -59,6 +60,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
                 {t('sidebarScheduleStreams')}
               </button>
             </li>
+            {hasFavorites && (
+                <li>
+                    <button
+                    onClick={() => onNavigate('favorites')}
+                    className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'favorites' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
+                    >
+                    {t('sidebarFavorites')}
+                    </button>
+                </li>
+            )}
             {showApplyLink && (
                <li>
                 <button

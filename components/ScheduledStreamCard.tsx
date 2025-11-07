@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { ScheduledStream, Channel } from '../types';
 import { useLocalization } from '../hooks/useLocalization';
 import { useCountdown } from '../hooks/useCountdown';
@@ -14,7 +14,51 @@ interface ScheduledStreamCardProps {
   isNotificationSubscribed: boolean;
   onNotificationToggle: (streamerName: string, enabled: boolean) => Promise<void>;
   notificationPermission: NotificationPermission | null;
+  isFavorite: boolean;
+  onToggleFavorite: (streamerName: string) => void;
 }
+
+const FavoriteStar: React.FC<{
+    streamerName: string;
+    isFavorite: boolean;
+    onToggle: (streamerName: string) => void;
+}> = ({ streamerName, isFavorite, onToggle }) => {
+    const { t } = useLocalization();
+    const [isClicked, setIsClicked] = useState(false);
+    const prevIsFavoriteRef = useRef(isFavorite);
+
+    useEffect(() => {
+        if (prevIsFavoriteRef.current !== isFavorite) {
+            setIsClicked(true);
+            setTimeout(() => setIsClicked(false), 300);
+        }
+        prevIsFavoriteRef.current = isFavorite;
+    }, [isFavorite]);
+
+    const toggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onToggle(streamerName);
+    };
+
+    const tooltipText = isFavorite ? t('removeFromFavorites') : t('addToFavorites');
+
+    return (
+        <div className="group/star relative z-20">
+            <button
+                onClick={toggle}
+                className={`p-2 rounded-full transition-colors ${isFavorite ? 'text-yellow-400' : 'text-gray-400 hover:text-white'} ${isClicked ? 'animate-star-pop' : ''}`}
+                aria-label={tooltipText}
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+            </button>
+            <span className="absolute top-full mt-2 right-0 rtl:right-auto rtl:left-0 scale-0 group-hover/star:scale-100 rounded bg-gray-800 p-2 text-xs text-white transition-all w-max max-w-xs text-center z-20">
+                {tooltipText}
+            </span>
+        </div>
+    );
+};
 
 const NotificationBell: React.FC<{
     streamerName: string;
@@ -66,7 +110,7 @@ const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, 
 );
 
 
-export const ScheduledStreamCard: React.FC<ScheduledStreamCardProps> = ({ schedule, onCardClick, isNotificationSubscribed, onNotificationToggle, notificationPermission }) => {
+export const ScheduledStreamCard: React.FC<ScheduledStreamCardProps> = ({ schedule, onCardClick, isNotificationSubscribed, onNotificationToggle, notificationPermission, isFavorite, onToggleFavorite }) => {
   const { t, language } = useLocalization();
   const [isCopied, setIsCopied] = useState(false);
   const countdown = useCountdown(schedule.startTime);
@@ -118,7 +162,12 @@ export const ScheduledStreamCard: React.FC<ScheduledStreamCardProps> = ({ schedu
           <span>{status.text}</span>
         </div>
         
-        <div className="absolute top-2 right-2 rtl:right-auto rtl:left-2">
+        <div className="absolute top-2 right-2 rtl:right-auto rtl:left-2 flex items-center">
+            <FavoriteStar
+                streamerName={streamer.username}
+                isFavorite={isFavorite}
+                onToggle={onToggleFavorite}
+            />
             <NotificationBell 
                 streamerName={streamer.username}
                 isSubscribed={isNotificationSubscribed}

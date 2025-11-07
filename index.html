@@ -78,6 +78,14 @@
       .animate-live-glow {
         animation: live-glow 2s ease-out;
       }
+      @keyframes star-pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.4) rotate(15deg); }
+        100% { transform: scale(1); }
+      }
+      .animate-star-pop {
+        animation: star-pop 0.3s ease-in-out;
+      }
       .animation-container {
         perspective: 1000px;
       }

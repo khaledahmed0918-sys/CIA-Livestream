@@ -10,14 +10,16 @@ interface ScheduledStreamsProps {
   streamerNotificationSettings: { [key: string]: boolean };
   onNotificationToggle: (streamerName: string, enabled: boolean) => Promise<void>;
   notificationPermission: NotificationPermission | null;
-  onStatsUpdate: (stats: { liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }) => void;
+  onStatsUpdate: (stats: { enrichedSchedules: EnrichedScheduledStream[], liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }) => void;
   searchQuery: string;
   sortOption: 'soonest' | 'status';
   isAnimatingOut: boolean;
   baseDelay: number;
+  isFavorite: (username: string) => boolean;
+  onToggleFavorite: (username: string) => void;
 }
 
-export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
+const ScheduledStreamsComponent: React.FC<ScheduledStreamsProps> = (props) => {
     const { 
         streamerData,
         onCardClick,
@@ -28,7 +30,9 @@ export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
         searchQuery,
         sortOption,
         isAnimatingOut,
-        baseDelay
+        baseDelay,
+        isFavorite,
+        onToggleFavorite,
     } = props;
     const [schedules, setSchedules] = useState<ScheduledStreamType[]>([]);
     const { t } = useLocalization();
@@ -71,6 +75,7 @@ export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
         });
         
         onStatsUpdate({
+            enrichedSchedules,
             liveSoonCount: liveSoonStreams.length,
             scheduledCount: scheduledStreams.length,
             liveSoonLinks: liveSoonStreams.map(s => s.streamer.profile_url)
@@ -142,6 +147,8 @@ export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
                             isNotificationSubscribed={!!streamerNotificationSettings[schedule.streamer.username]}
                             onNotificationToggle={onNotificationToggle}
                             notificationPermission={notificationPermission}
+                            isFavorite={isFavorite(schedule.streamer.username)}
+                            onToggleFavorite={onToggleFavorite}
                         />
                      </div>
                 ))}
@@ -149,3 +156,7 @@ export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
         </div>
     );
 };
+
+export const ScheduledStreams = Object.assign(ScheduledStreamsComponent, {
+    Card: ScheduledStreamCard,
+});

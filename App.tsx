@@ -13,6 +13,8 @@ import type { QuranicVerse as VerseType } from './data/quranicVerses';
 import { QuranicVerse } from './components/QuranicVerse';
 import { ScheduledStreams } from './components/ScheduledStreams';
 import { Sidebar } from './components/Sidebar';
+import { useFavorites } from './hooks/useFavorites';
+import { EnrichedScheduledStream } from './components/ScheduledStreamCard';
 
 // LanguageToggle Component
 const LanguageToggle: React.FC = () => {
@@ -262,10 +264,10 @@ const App: React.FC = () => {
   const [isLinksCopied, setIsLinksCopied] = useState(false);
   const [randomVerse, setRandomVerse] = useState<VerseType | null>(null);
   
-  const [view, setView] = useState<'live' | 'scheduled'>('live');
+  const [view, setView] = useState<'live' | 'scheduled' | 'favorites'>('live');
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const isTransitioningRef = useRef(false);
-  const [scheduleStats, setScheduleStats] = useState<{ liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }>({ liveSoonCount: 0, scheduledCount: 0, liveSoonLinks: [] });
+  const [scheduleStats, setScheduleStats] = useState<{ enrichedSchedules: EnrichedScheduledStream[], liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }>({ enrichedSchedules: [], liveSoonCount: 0, scheduledCount: 0, liveSoonLinks: [] });
   const [scheduleSearchQuery, setScheduleSearchQuery] = useState('');
   const [scheduleSortOption, setScheduleSortOption] = useState<'soonest' | 'status'>('soonest');
   
@@ -275,6 +277,9 @@ const App: React.FC = () => {
   // Notification State
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | null>(null);
   const [streamerNotificationSettings, setStreamerNotificationSettings] = useState<{ [key: string]: boolean }>({});
+  
+  // Favorites State
+  const { favorites, toggleFavorite, clearFavorites, isFavorite, hasFavorites } = useFavorites();
 
   useEffect(() => {
     // Pick a random verse on mount
@@ -453,6 +458,26 @@ const App: React.FC = () => {
     
     return streamers;
   }, [sortedStreamers, searchQuery, selectedTags]);
+  
+    const favoriteLiveStreamers = useMemo(() => {
+        return (streamerData?.data || []).filter(s => favorites.includes(s.username));
+    }, [streamerData, favorites]);
+
+    const favoriteScheduledStreamers = useMemo(() => {
+        return scheduleStats.enrichedSchedules.filter(s => favorites.includes(s.streamer.username));
+    }, [scheduleStats.enrichedSchedules, favorites]);
+
+    const allFavoriteStreamers = useMemo(() => {
+        const liveFavs = favoriteLiveStreamers;
+        const scheduledFavsUsernames = new Set(favoriteScheduledStreamers.map(s => s.streamer.username));
+        // Avoid duplicates if a scheduled streamer also appears in the main list
+        const uniqueLiveFavs = liveFavs.filter(s => !scheduledFavsUsernames.has(s.username));
+        return [...uniqueLiveFavs, ...favoriteScheduledStreamers.map(s => s.streamer)];
+    }, [favoriteLiveStreamers, favoriteScheduledStreamers]);
+    
+    const favoritesLiveCount = useMemo(() => favoriteLiveStreamers.filter(s => s.is_live).length, [favoriteLiveStreamers]);
+    const favoritesOfflineCount = useMemo(() => favoriteLiveStreamers.filter(s => !s.is_live).length + favoriteScheduledStreamers.length, [favoriteLiveStreamers, favoriteScheduledStreamers]);
+
 
   const liveCount = useMemo(() => filteredStreamers.filter(s => s.is_live).length, [filteredStreamers]);
   const offlineCount = useMemo(() => filteredStreamers.filter(s => !s.is_live).length, [filteredStreamers]);
@@ -476,58 +501,65 @@ const App: React.FC = () => {
   const liveStreamersInFilter = useMemo(() => filteredStreamers.filter(s => s.is_live), [filteredStreamers]);
 
   const handleCopyLinks = useCallback(() => {
-    let urlsString: string;
-
-    if (view === 'scheduled') {
-        urlsString = scheduleStats.liveSoonLinks.join('\n');
-    } else {
-        const urlsToCopy = liveStreamersInFilter.length > 0
-            ? liveStreamersInFilter.map(s => s.live_url)
-            : filteredStreamers.map(s => s.profile_url);
-        urlsString = urlsToCopy.filter(Boolean).join('\n');
+    let urlsToCopy: string[] = [];
+  
+    switch(view) {
+      case 'live':
+        urlsToCopy = liveStreamersInFilter.length > 0
+          ? liveStreamersInFilter.map(s => s.live_url!)
+          : filteredStreamers.map(s => s.profile_url);
+        break;
+      case 'scheduled':
+        urlsToCopy = scheduleStats.liveSoonLinks;
+        break;
+      case 'favorites':
+        urlsToCopy = allFavoriteStreamers.map(s => s.profile_url);
+        break;
     }
+  
+    const urlsString = urlsToCopy.filter(Boolean).join('\n');
     
     if (urlsString) {
-        navigator.clipboard.writeText(urlsString).then(() => {
-            setIsLinksCopied(true);
-            setTimeout(() => setIsLinksCopied(false), 2000);
-        }).catch(err => {
-            console.error('Failed to copy links: ', err);
-            alert('Could not copy links to clipboard.');
-        });
+      navigator.clipboard.writeText(urlsString).then(() => {
+        setIsLinksCopied(true);
+        setTimeout(() => setIsLinksCopied(false), 2000);
+      }).catch(err => {
+        console.error('Failed to copy links: ', err);
+        alert('Could not copy links to clipboard.');
+      });
     }
-  }, [view, filteredStreamers, liveStreamersInFilter, scheduleStats.liveSoonLinks]);
+  }, [view, filteredStreamers, liveStreamersInFilter, scheduleStats.liveSoonLinks, allFavoriteStreamers]);
   
-  const copyButtonText = view === 'scheduled'
-    ? t('copyLiveSoonLinks')
-    : liveStreamersInFilter.length > 0 ? t('copyLiveLinks') : t('copyProfileLinks');
+    const copyButtonText = useMemo(() => {
+        if (view === 'scheduled') return t('copyLiveSoonLinks');
+        if (view === 'favorites') return t('copyFavorites');
+        return liveStreamersInFilter.length > 0 ? t('copyLiveLinks') : t('copyProfileLinks');
+    }, [view, t, liveStreamersInFilter.length]);
     
-  const isCopyButtonDisabled = view === 'scheduled' && scheduleStats.liveSoonLinks.length === 0;
+  const isCopyButtonDisabled = (view === 'scheduled' && scheduleStats.liveSoonLinks.length === 0) || (view === 'favorites' && allFavoriteStreamers.length === 0);
   
-  const toggleView = () => {
-    if (isTransitioningRef.current) return;
+  const changeView = (newView: 'live' | 'scheduled' | 'favorites') => {
+    if (isTransitioningRef.current || view === newView) return;
     isTransitioningRef.current = true;
     
     setIsAnimatingOut(true);
     
     setTimeout(() => {
-        setView(current => (current === 'live' ? 'scheduled' : 'live'));
+        setView(newView);
         setIsAnimatingOut(false);
         setTimeout(() => {
             isTransitioningRef.current = false;
         }, 50);
-    }, 300); // Must match CSS animation duration
+    }, 300);
   };
   
-  const handleScheduleStatsUpdate = useCallback((stats: { liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }) => {
+  const handleScheduleStatsUpdate = useCallback((stats: { enrichedSchedules: EnrichedScheduledStream[], liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }) => {
     setScheduleStats(stats);
   }, []);
   
-  const handleSidebarNavigate = (section: 'live' | 'scheduled' | 'credits' | 'apply') => {
-    if (section === 'live' || section === 'scheduled') {
-        if (view !== section) {
-            toggleView();
-        }
+  const handleSidebarNavigate = (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites') => {
+    if (section === 'live' || section === 'scheduled' || section === 'favorites') {
+        changeView(section);
     } else if (section === 'credits') {
       document.getElementById('credits-footer')?.scrollIntoView({ behavior: 'smooth' });
     } else if (section === 'apply') {
@@ -536,6 +568,19 @@ const App: React.FC = () => {
     
     setIsSidebarOpen(false);
   };
+  
+  const handleClearFavorites = () => {
+    clearFavorites();
+    changeView('live');
+  };
+
+  const getTitle = () => {
+    switch(view) {
+        case 'live': return t('liveStreams');
+        case 'scheduled': return t('scheduleStreams');
+        case 'favorites': return t('favoritesStreams');
+    }
+  }
 
 
   return (
@@ -552,6 +597,7 @@ const App: React.FC = () => {
         onNavigate={handleSidebarNavigate} 
         activeView={view} 
         showApplyLink={ENABLE_APPLY_SECTION}
+        hasFavorites={hasFavorites}
       />
 
       <div className="container mx-auto px-4 py-8">
@@ -579,7 +625,7 @@ const App: React.FC = () => {
             C I A
           </h1>
           <h2 className="text-xl font-semibold text-black/80 dark:text-white/80 mt-2" style={{ fontFamily: "'Poppins', sans-serif", transform: 'translateX(-10px)' }}>
-            {view === 'live' ? t('liveStreams') : t('scheduleStreams')}
+            {getTitle()}
           </h2>
 
           {randomVerse && <QuranicVerse verse={randomVerse} />}
@@ -698,6 +744,8 @@ const App: React.FC = () => {
                                 isNotificationSubscribed={!!streamerNotificationSettings[streamer.username]}
                                 onNotificationToggle={updateStreamerNotificationSetting}
                                 notificationPermission={notificationPermission}
+                                isFavorite={isFavorite(streamer.username)}
+                                onToggleFavorite={toggleFavorite}
                               />
                           </div>
                         ))}
@@ -711,7 +759,7 @@ const App: React.FC = () => {
                     </>
                   ) : null}
               </>
-          ) : (
+          ) : view === 'scheduled' ? (
               <>
                   <div className="space-y-8 mb-6">
                      {streamerData && (
@@ -760,8 +808,78 @@ const App: React.FC = () => {
                       sortOption={scheduleSortOption}
                       isAnimatingOut={isAnimatingOut}
                       baseDelay={150}
+                      isFavorite={isFavorite}
+                      onToggleFavorite={toggleFavorite}
                   />
               </>
+          ) : ( // Favorites view
+                <>
+                    <div className="relative z-10 space-y-6 mb-6">
+                        <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '150ms' }}>
+                            <div className="flex justify-center items-center flex-wrap gap-4">
+                                <button onClick={handleCopyLinks} disabled={isCopyButtonDisabled} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                  {isLinksCopied ? ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg><span>{t('copied')}</span></> ) : ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><span>{copyButtonText}</span></> )}
+                                </button>
+                                <button onClick={handleClearFavorites} disabled={!hasFavorites} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed text-red-400">
+                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                   <span>{t('clearFavorites')}</span>
+                                </button>
+                            </div>
+                            <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm text-black/80 dark:text-white/80 border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
+                                <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400"></span><span>{t('liveCount', { count: favoritesLiveCount })}</span></span>
+                                <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
+                                <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-red-500"></span><span>{t('offlineCount', { count: favoritesOfflineCount })}</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    {hasFavorites ? (
+                        <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                           {[...favoriteLiveStreamers, ...favoriteScheduledStreamers].sort((a,b) => {
+                                // Sort live streamers first
+                               const isALive = 'is_live' in a && a.is_live;
+                               const isBLive = 'is_live' in b && b.is_live;
+                               if (isALive && !isBLive) return -1;
+                               if (!isALive && isBLive) return 1;
+                               return 0; // Keep original order for same-status
+                           }).map((item, index) => {
+                               if ('streamer' in item) { // It's a ScheduledStream
+                                   return (
+                                       <div key={item.id} className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: `${200 + index * 30}ms` }}>
+                                         <ScheduledStreams.Card 
+                                            schedule={item}
+                                            onCardClick={() => setSelectedStreamer(item.streamer)}
+                                            isNotificationSubscribed={!!streamerNotificationSettings[item.streamer.username]}
+                                            onNotificationToggle={updateStreamerNotificationSetting}
+                                            notificationPermission={notificationPermission}
+                                            isFavorite={isFavorite(item.streamer.username)}
+                                            onToggleFavorite={toggleFavorite}
+                                         />
+                                       </div>
+                                   )
+                               } else { // It's a Channel
+                                   return (
+                                     <div key={item.username} className={isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} style={{ animationDelay: `${200 + index * 30}ms` }}>
+                                         <StreamerCard 
+                                            streamer={item} 
+                                            onCardClick={() => setSelectedStreamer(item)}
+                                            isNotificationSubscribed={!!streamerNotificationSettings[item.username]}
+                                            onNotificationToggle={updateStreamerNotificationSetting}
+                                            notificationPermission={notificationPermission}
+                                            isFavorite={isFavorite(item.username)}
+                                            onToggleFavorite={toggleFavorite}
+                                         />
+                                     </div>
+                                   );
+                               }
+                           })}
+                        </main>
+                    ) : (
+                         <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
+                          <h3 className="text-2xl font-bold">{t('noFavoritesTitle')}</h3>
+                          <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noFavoritesBody')}</p>
+                        </div>
+                    )}
+                </>
           )}
         </div>
       </div>
