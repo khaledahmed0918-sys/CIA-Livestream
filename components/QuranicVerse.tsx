@@ -15,8 +15,9 @@ export const QuranicVerse: React.FC<QuranicVerseProps> = ({ verse }) => {
       >
         {verse.verse}
       </p>
-      <p className="text-sm text-black/70 dark:text-white/70 mb-3" dir="rtl">{verse.source}</p>
-      <p className="text-base text-black/80 dark:text-white/80" dir="rtl">{verse.interpretation}</p>
+      {/* FIX: Conditionally render source and interpretation as they are now optional */}
+      {verse.source && <p className="text-sm text-black/70 dark:text-white/70 mb-3" dir="rtl">{verse.source}</p>}
+      {verse.interpretation && <p className="text-base text-black/80 dark:text-white/80" dir="rtl">{verse.interpretation}</p>}
     </div>
   );
 };

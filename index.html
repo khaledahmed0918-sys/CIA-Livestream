@@ -22,13 +22,36 @@
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     </script>
     <style>
+      :root {
+        --bg-light-1: #e0c3fc;
+        --bg-light-2: #8ec5fc;
+        --bg-light-3: #8ec5fc;
+        --bg-light-type: 'gradient2';
+        --bg-light-dir: 120deg;
+        --bg-dark-1: #141e30;
+        --bg-dark-2: #243b55;
+        --bg-dark-3: #243b55;
+        --bg-dark-type: 'gradient2';
+        --bg-dark-dir: to right;
+
+        --text-title: #000;
+        --text-body: #111827; /* Fallback for Tailwind text-black/90 */
+        --text-streamer: #111827;
+      }
+      .dark:root {
+        --text-title: #fff;
+        --text-body: #e5e7eb; /* Fallback for Tailwind dark:text-white/90 */
+        --text-streamer: #e5e7eb;
+      }
       body {
         font-family: 'Inter', sans-serif;
-        background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+        background-color: var(--bg-light-1);
+        background-image: linear-gradient(var(--bg-light-dir), var(--bg-light-1), var(--bg-light-2));
         background-attachment: fixed;
       }
       .dark body {
-        background: linear-gradient(to right, #141e30, #243b55);
+        background-color: var(--bg-dark-1);
+        background-image: linear-gradient(var(--bg-dark-dir), var(--bg-dark-1), var(--bg-dark-2));
         background-attachment: fixed;
       }
       @keyframes pulse {
@@ -122,7 +145,8 @@
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lodash-es": "https://aistudiocdn.com/lodash-es@^4.17.21"
   }
 }
 </script>

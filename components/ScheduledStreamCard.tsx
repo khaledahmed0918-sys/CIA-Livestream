@@ -46,7 +46,7 @@ const FavoriteStar: React.FC<{
         <div className="group/star relative z-20">
             <button
                 onClick={toggle}
-                className={`p-2 rounded-full transition-colors ${isFavorite ? 'text-yellow-400' : 'text-gray-400 hover:text-white'} ${isClicked ? 'animate-star-pop' : ''}`}
+                className={`p-2 rounded-full transition-transform duration-200 ease-in-out active:scale-90 ${isFavorite ? 'text-yellow-400' : 'text-gray-400 hover:text-white'} ${isClicked ? 'animate-star-pop' : ''}`}
                 aria-label={tooltipText}
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -79,7 +79,7 @@ const NotificationBell: React.FC<{
     <div className="group/bell relative z-20">
       <button 
         onClick={toggleSubscription} 
-        className={`p-2 rounded-full transition-colors ${isSubscribed ? 'text-yellow-400' : 'text-gray-400 hover:text-white'} disabled:opacity-50 disabled:cursor-not-allowed`}
+        className={`p-2 rounded-full transition-transform duration-200 ease-in-out active:scale-90 ${isSubscribed ? 'text-yellow-400' : 'text-gray-400 hover:text-white'} disabled:opacity-50 disabled:cursor-not-allowed`}
         aria-label={tooltipText}
         disabled={notificationPermission === 'denied' && !isSubscribed}
       >
@@ -152,115 +152,118 @@ export const ScheduledStreamCard: React.FC<ScheduledStreamCardProps> = ({ schedu
       role="button"
       tabIndex={0}
       aria-label={`${t('viewDetails')} for ${streamer.display_name}`}
+      style={{ background: 'var(--card-bg)' }}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100 dark:from-white/5"></div>
-      
-      <div className="relative z-10 flex flex-col h-full">
-        {/* Status Badge */}
-        <div className="absolute left-[-0.5rem] top-[-0.5rem] rtl:left-auto rtl:right-4 flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs font-semibold backdrop-blur-sm z-10" role="status">
-          <span className={`h-2.5 w-2.5 rounded-full ${status.color} ${status.animation}`}></span>
-          <span>{status.text}</span>
-        </div>
+      <div className="streamer-card-text" style={{ color: 'var(--text-streamer)' }}>
+        <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100 dark:from-white/5"></div>
         
-        <div className="absolute top-2 right-2 rtl:right-auto rtl:left-2 flex items-center">
-            <FavoriteStar
-                streamerName={streamer.username}
-                isFavorite={isFavorite}
-                onToggle={onToggleFavorite}
-            />
-            <NotificationBell 
-                streamerName={streamer.username}
-                isSubscribed={isNotificationSubscribed}
-                onToggle={onNotificationToggle}
-                notificationPermission={notificationPermission}
-            />
-        </div>
-
-        <div className="flex items-center gap-4 pt-8">
-           <Tooltip text={formatFullDateTime(schedule.startTime, language)}>
-            <a href={streamer.profile_url} target="_blank" rel="noopener noreferrer" aria-label={`${streamer.display_name}'s profile`} onClick={(e) => e.stopPropagation()}>
-                <img
-                  src={streamer.profile_pic || 'https://picsum.photos/200'}
-                  alt={`${streamer.display_name}'s avatar`}
-                  className="h-16 w-16 rounded-full border-2 border-white/20 object-cover"
-                />
-            </a>
-          </Tooltip>
-          <div className="flex-1 overflow-hidden">
-            <h3 className="truncate text-xl font-bold">{streamer.display_name}</h3>
-             <p className="truncate text-sm text-black/70 dark:text-white/70">
-                <span className="font-semibold">{t('character')}</span> {firstCharacter}
-             </p>
+        <div className="relative z-10 flex flex-col h-full">
+          {/* Status Badge */}
+          <div className="absolute left-[-0.5rem] top-[-0.5rem] rtl:left-auto rtl:right-4 flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-xs font-semibold backdrop-blur-sm z-10" role="status">
+            <span className={`h-2.5 w-2.5 rounded-full ${status.color} ${status.animation}`}></span>
+            <span>{status.text}</span>
           </div>
-        </div>
+          
+          <div className="absolute top-2 right-2 rtl:right-auto rtl:left-2 flex items-center">
+              <FavoriteStar
+                  streamerName={streamer.username}
+                  isFavorite={isFavorite}
+                  onToggle={onToggleFavorite}
+              />
+              <NotificationBell 
+                  streamerName={streamer.username}
+                  isSubscribed={isNotificationSubscribed}
+                  onToggle={onNotificationToggle}
+                  notificationPermission={notificationPermission}
+              />
+          </div>
 
-        {(streamer.followers_count !== null) && (
-            <Tooltip text={`${streamer.followers_count.toLocaleString()} ${t('followers')}`}>
-                 <div className="mt-2 flex items-center gap-1.5 text-sm text-black/70 dark:text-white/70">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                    </svg>
-                    <span className="font-semibold">{streamer.followers_count.toLocaleString()}</span>
-                    <span>{t('followers')}</span>
-                </div>
+          <div className="flex items-center gap-4 pt-8">
+            <Tooltip text={formatFullDateTime(schedule.startTime, language)}>
+              <a href={streamer.profile_url} target="_blank" rel="noopener noreferrer" aria-label={`${streamer.display_name}'s profile`} onClick={(e) => e.stopPropagation()}>
+                  <img
+                    src={streamer.profile_pic || 'https://picsum.photos/200'}
+                    alt={`${streamer.display_name}'s avatar`}
+                    className="h-16 w-16 rounded-full border-2 border-white/20 object-cover"
+                  />
+              </a>
             </Tooltip>
-        )}
-
-        {streamer.tags && streamer.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {streamer.tags.slice(0, 3).map(tag => (
-              <span key={tag} className="rounded-full bg-black/20 dark:bg-white/10 px-2.5 py-1 text-xs font-semibold">
-                {tag}
-              </span>
-            ))}
+            <div className="flex-1 overflow-hidden">
+              <h3 className="truncate text-xl font-bold">{streamer.display_name}</h3>
+              <p className="truncate text-sm opacity-70">
+                  <span className="font-semibold">{t('character')}</span> {firstCharacter}
+              </p>
+            </div>
           </div>
-        )}
-        
-        <div className="flex-grow my-4 text-center">
-            <p className="font-semibold text-sm text-black/70 dark:text-white/70">{t('liveIn')}</p>
-            <p className="text-3xl font-bold tracking-wider">{countdown.isOver ? "0s" : formatCountdown()}</p>
-        </div>
 
-        <div className="flex items-end justify-between gap-4">
-            <div className="flex-1 min-w-0 text-sm">
-                 {schedule.notes ? (
-                    <Tooltip text={schedule.notes}>
-                        <p className="truncate italic text-black/70 dark:text-white/70">"{schedule.notes}"</p>
-                    </Tooltip>
-                ) : (
-                    <p className="text-black/70 dark:text-white/70">
-                        {formatFullDateTime(schedule.startTime, language)}
-                    </p>
-                )}
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-               <Tooltip text={isCopied ? t('copied') : t('shareProfile')}>
-                 <button
-                   onClick={handleShareClick}
-                   className="flex-shrink-0 rounded-xl border border-white/10 bg-white/5 p-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
-                   aria-label={t('shareProfile')}
-                 >
-                   {isCopied ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+          {(streamer.followers_count !== null) && (
+              <Tooltip text={`${streamer.followers_count.toLocaleString()} ${t('followers')}`}>
+                  <div className="mt-2 flex items-center gap-1.5 text-sm opacity-70">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                       </svg>
-                   ) : (
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                     </svg>
-                   )}
-                 </button>
-               </Tooltip>
-               <a
-                   href={streamer.profile_url}
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   onClick={(e) => e.stopPropagation()}
-                   className="flex-shrink-0 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
-               >
-                   {t('link')}
-               </a>
+                      <span className="font-semibold">{streamer.followers_count.toLocaleString()}</span>
+                      <span>{t('followers')}</span>
+                  </div>
+              </Tooltip>
+          )}
+
+          {streamer.tags && streamer.tags.length > 0 && (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {streamer.tags.slice(0, 3).map(tag => (
+                <span key={tag} className="rounded-full bg-black/20 dark:bg-white/10 px-2.5 py-1 text-xs font-semibold">
+                  {tag}
+                </span>
+              ))}
             </div>
+          )}
+          
+          <div className="flex-grow my-4 text-center">
+              <p className="font-semibold text-sm opacity-70">{t('liveIn')}</p>
+              <p className="text-3xl font-bold tracking-wider">{countdown.isOver ? "0s" : formatCountdown()}</p>
+          </div>
+
+          <div className="flex items-end justify-between gap-4">
+              <div className="flex-1 min-w-0 text-sm">
+                  {schedule.notes ? (
+                      <Tooltip text={schedule.notes}>
+                          <p className="truncate italic opacity-70">"{schedule.notes}"</p>
+                      </Tooltip>
+                  ) : (
+                      <p className="opacity-70">
+                          {formatFullDateTime(schedule.startTime, language)}
+                      </p>
+                  )}
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Tooltip text={isCopied ? t('copied') : t('shareProfile')}>
+                  <button
+                    onClick={handleShareClick}
+                    className="flex-shrink-0 rounded-xl border border-white/10 bg-white/5 p-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 active:scale-95"
+                    aria-label={t('shareProfile')}
+                  >
+                    {isCopied ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                      </svg>
+                    )}
+                  </button>
+                </Tooltip>
+                <a
+                    href={streamer.profile_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-shrink-0 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 active:scale-95"
+                >
+                    {t('link')}
+                </a>
+              </div>
+          </div>
         </div>
       </div>
     </div>

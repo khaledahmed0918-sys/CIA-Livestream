@@ -22,7 +22,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
       aria-modal="true"
       aria-labelledby="sidebar-title"
     >
-      <div className="flex flex-col h-full p-6 text-black dark:text-white">
+      <div className="flex flex-col h-full p-6 text-black dark:text-white" style={{ color: 'var(--text-body)' }}>
         <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
                  <img 
@@ -30,7 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
                     alt="CIA Logo" 
                     className="w-10 h-10 rounded-full border border-white/20"
                 />
-                <h2 id="sidebar-title" className="text-xl font-bold tracking-widest">C I A</h2>
+                <h2 id="sidebar-title" className="text-xl font-bold tracking-widest" style={{ color: 'var(--text-title)' }}>C I A</h2>
             </div>
           
           <button onClick={onClose} aria-label={t('close')}>

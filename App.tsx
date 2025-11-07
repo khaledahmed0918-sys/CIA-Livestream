@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { fetchChannelStatuses } from './services/kickService';
 import type { KickApiResponse, Channel } from './types';
@@ -78,15 +80,15 @@ const ApplySection: React.FC = () => {
     ].sort((a, b) => b.text.length - a.text.length), [t]);
 
     const ExperienceTag: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-        <div className="bg-black/10 dark:bg-white/10 rounded-lg px-4 py-2 text-center font-semibold text-base">
+        <div className="bg-black/10 dark:bg-white/10 rounded-lg px-4 py-2 text-center font-semibold text-base" style={{ color: 'var(--text-body)' }}>
             {children}
         </div>
     );
     
     return (
         <section id="apply-section" className="container mx-auto px-4 pb-8">
-            <div className="w-full max-w-6xl mx-auto rounded-2xl border border-white/10 bg-white/5 p-8 text-black shadow-lg backdrop-blur-lg transition-all duration-300 ease-in-out hover:shadow-2xl dark:text-white dark:border-white/10 dark:bg-black/20 overflow-hidden">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-center text-black dark:text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            <div className="w-full max-w-6xl mx-auto rounded-2xl border border-white/10 bg-white/5 p-8 shadow-lg backdrop-blur-lg transition-all duration-300 ease-in-out hover:shadow-2xl dark:border-white/10 dark:bg-black/20 overflow-hidden" style={{ background: 'var(--card-bg)' }}>
+                <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-center" style={{ fontFamily: "'Poppins', sans-serif", color: 'var(--text-title)' }}>
                     {t('applyTitleOutOfRp')}
                 </h2>
 
@@ -95,11 +97,11 @@ const ApplySection: React.FC = () => {
                         {/* Left Column: Note */}
                         <div className="flex flex-col text-center lg:text-left rtl:lg:text-right">
                             <div>
-                                <h3 className="text-3xl font-bold mb-2">{t('noteTitle')}</h3>
-                                <p className="text-lg text-black/80 dark:text-white/80">{t('noteText')}</p>
+                                <h3 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-title)' }}>{t('noteTitle')}</h3>
+                                <p className="text-lg" style={{ color: 'var(--text-body)' }}>{t('noteText')}</p>
                             </div>
                             <img 
-                                src="https://i.postimg.cc/Ss3Rz0gj/Bs-BKXFTQ.png"
+                                src={"https://i.postimg.cc/Ss3Rz0gj/Bs-BKXFTQ.png"}
                                 alt="Field Report Example"
                                 className="w-[600px] h-auto max-w-none rounded-xl shadow-lg mt-auto object-cover -translate-x-[75px] -translate-y-[-29px]"
                             />
@@ -117,6 +119,7 @@ const ApplySection: React.FC = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-block w-56 rounded-xl border border-white/10 bg-white/10 px-8 py-3 text-lg font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
+                                style={{ color: 'var(--text-body)' }}
                             >
                                 {t('applyButton')}
                             </a>
@@ -125,7 +128,7 @@ const ApplySection: React.FC = () => {
                         {/* Right Column: Targeted Experiences */}
                         <div className="space-y-6 text-center lg:text-left rtl:lg:text-right">
                              <div>
-                                <h3 className="text-3xl font-bold mb-4">{t('targetedExperiencesTitle')}</h3>
+                                <h3 className="text-3xl font-bold mb-4" style={{ color: 'var(--text-title)' }}>{t('targetedExperiencesTitle')}</h3>
                                 <div className="space-y-3">
                                     {experiences.map(exp => (
                                         <ExperienceTag key={exp.key}>{exp.text}</ExperienceTag>
@@ -139,12 +142,12 @@ const ApplySection: React.FC = () => {
                         <div className="flex flex-col h-full space-y-6 text-center lg:text-left rtl:lg:text-right">
                             <div className="space-y-6 flex-grow">
                                 <div>
-                                    <h3 className="text-2xl font-bold mb-2">{t('noteTitle')}</h3>
-                                    <p className="text-black/80 dark:text-white/80">{t('noteText')}</p>
+                                    <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-title)' }}>{t('noteTitle')}</h3>
+                                    <p style={{ color: 'var(--text-body)' }}>{t('noteText')}</p>
                                 </div>
                                 <hr className="border-t border-white/10" />
                                 <div>
-                                    <h3 className="text-2xl font-bold mb-4">{t('targetedExperiencesTitle')}</h3>
+                                    <h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-title)' }}>{t('targetedExperiencesTitle')}</h3>
                                     <div className="space-y-3">
                                         <ExperienceTag>{experiences[0].text}</ExperienceTag>
                                         <ExperienceTag>{experiences[1].text}</ExperienceTag>
@@ -160,6 +163,7 @@ const ApplySection: React.FC = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full mt-6 rounded-xl border border-white/10 bg-white/10 px-8 py-3 text-lg font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
+                                style={{ color: 'var(--text-body)' }}
                             >
                                 {t('applyButton')}
                             </a>
@@ -214,8 +218,8 @@ const Footer: React.FC = () => {
     );
 
     return (
-        <footer id="credits-footer" className="text-center py-8 text-black/80 dark:text-white/80">
-            <h3 className="text-xl font-semibold mb-6">{t('footerTitle')}</h3>
+        <footer id="credits-footer" className="text-center py-8" style={{ color: 'var(--text-body)' }}>
+            <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-title)' }}>{t('footerTitle')}</h3>
             <div className="flex justify-center items-start gap-12 md:gap-24">
                 {/* Mohammed */}
                 <div className="flex flex-col items-center gap-3">
@@ -287,14 +291,21 @@ const App: React.FC = () => {
   const [multiStreamLink, setMultiStreamLink] = useState<string | null>(null);
   const [isMultiStreamLinkCopied, setIsMultiStreamLinkCopied] = useState(false);
 
+  // Scroll Button State
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
+
   useEffect(() => {
     // Pick a random verse on mount
-    setRandomVerse(quranicVerses[Math.floor(Math.random() * quranicVerses.length)]);
+    const verseSource = quranicVerses;
+    if (verseSource.length > 0) {
+        setRandomVerse(verseSource[Math.floor(Math.random() * verseSource.length)]);
+    }
 
     setNotificationPermission(typeof Notification !== 'undefined' ? Notification.permission : null);
     registerServiceWorker();
-    const settings = JSON.parse(localStorage.getItem('streamerNotifications') || '{}');
-    setStreamerNotificationSettings(settings);
+    const settingsLS = JSON.parse(localStorage.getItem('streamerNotifications') || '{}');
+    setStreamerNotificationSettings(settingsLS);
   }, []);
   
   const updateStreamerNotificationSetting = async (streamerName: string, enabled: boolean) => {
@@ -389,6 +400,60 @@ const App: React.FC = () => {
     const intervalId = setInterval(fetchData, POLLING_INTERVAL_SECONDS * 1000);
     return () => clearInterval(intervalId);
   }, [fetchData]);
+  
+  useEffect(() => {
+    const rootEl = document.getElementById('root');
+    if (!rootEl) return;
+
+    const handleScroll = () => {
+      // Considered "at top" if scrolled less than 100px
+      setIsAtTop(window.scrollY < 100);
+    };
+
+    const checkVisibility = () => {
+      setShowScrollBtn(document.documentElement.scrollHeight > window.innerHeight);
+    };
+
+    const checkState = () => {
+      handleScroll();
+      checkVisibility();
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', checkState);
+
+    // Use MutationObserver to detect content changes that affect scroll height
+    const observer = new MutationObserver(checkState);
+    observer.observe(rootEl, {
+      childList: true,
+      subtree: true,
+    });
+    
+    // Initial check after a short delay to allow content to render
+    const initialCheckTimeout = setTimeout(checkState, 500);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', checkState);
+      observer.disconnect();
+      clearTimeout(initialCheckTimeout);
+    };
+  }, []);
+
+
+  const handleScrollButtonClick = () => {
+    if (isAtTop) {
+      document.getElementById('credits-footer')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end'
+      });
+    } else {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  };
   
   const sortedStreamers = useMemo(() => {
     if (!streamerData?.data) return [];
@@ -622,7 +687,7 @@ const App: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen w-full text-black/90 transition-colors duration-300 dark:text-white/90">
+    <div className="min-h-screen w-full transition-colors duration-300" style={{ color: 'var(--text-body)' }}>
       <div className="fixed top-0 left-0 w-full h-full -z-10"></div>
       
       <div 
@@ -639,14 +704,19 @@ const App: React.FC = () => {
       />
 
       <div className="container mx-auto px-4 py-8">
-        <header className="flex flex-col items-center mb-8 relative">
+        <header className="w-full flex flex-col items-center mb-8 relative">
+          <div className="absolute top-0 left-0 rtl:left-auto rtl:right-0 md:hidden">
+            <ThemeToggle />
+          </div>
           <div className="absolute top-0 right-0 rtl:right-auto rtl:left-0 flex items-center gap-2">
             <NotificationsToggle enabled={areAnyNotificationsEnabled} onToggle={handleToggleAllNotifications} permission={notificationPermission} />
             <LanguageToggle />
-            <ThemeToggle />
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
              <button
                 onClick={() => setIsSidebarOpen(true)}
-                className="p-2 rounded-full bg-black/10 dark:bg-white/10 text-black dark:text-white backdrop-blur-sm transition-colors"
+                className="p-2 rounded-full bg-black/10 dark:bg-white/10 backdrop-blur-sm transition-colors"
                 aria-label={t('openMenu')}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -659,16 +729,16 @@ const App: React.FC = () => {
             alt="CIA Logo" 
             className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg mb-4 transform -translate-x-3"
           />
-          <h1 className="text-5xl font-bold tracking-[0.5em] text-black dark:text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <h1 className="text-5xl font-bold tracking-[0.5em]" style={{ fontFamily: "'Poppins', sans-serif", color: 'var(--text-title)' }}>
             C I A
           </h1>
-          <h2 className="text-xl font-semibold text-black/80 dark:text-white/80 mt-2" style={{ fontFamily: "'Poppins', sans-serif", transform: 'translateX(-10px)' }}>
+          <h2 className="text-xl font-semibold mt-2" style={{ fontFamily: "'Poppins', sans-serif", transform: 'translateX(-10px)', color: 'var(--text-title)' }}>
             {getTitle()}
           </h2>
 
           {randomVerse && <QuranicVerse verse={randomVerse} />}
 
-          {lastUpdated && view === 'live' && (
+          {lastUpdated && (view === 'live' || view === 'scheduled' || view === 'favorites' || view === 'multistream') && (
              <p className="text-sm text-black/60 dark:text-white/60 mt-4">
                {t('lastUpdated', { time: lastUpdated.toLocaleTimeString() })}
              </p>
@@ -682,7 +752,7 @@ const App: React.FC = () => {
           {view === 'live' ? (
               <>
                   <div className="relative z-10 space-y-6 mb-6">
-                    {streamerData && (
+                    {streamerData && (view === 'live' || view === 'favorites' || view === 'multistream') && (
                         <>
                           <div className="w-full max-w-6xl mx-auto space-y-4">
                             {/* Search Input */}
@@ -703,7 +773,7 @@ const App: React.FC = () => {
                                   selectedTags={selectedTags} 
                                   onSelectedTagsChange={setSelectedTags} 
                                   tagCounts={tagCounts} 
-                                  onOpenChange={setIsTagFilterOpen}
+                                  onOpenChange={setIsTagFilterOpen} 
                                 />
                               </div>
                               <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
@@ -724,7 +794,7 @@ const App: React.FC = () => {
                           
                           {/* Live Stats */}
                           <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '150ms' }}>
-                            <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm text-black/80 dark:text-white/80 border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
+                            <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
                               <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400"></span><span>{t('liveCount', { count: liveCount })}</span></span>
                               <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
                               <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-red-500"></span><span>{t('offlineCount', { count: offlineCount })}</span></span>
@@ -790,8 +860,8 @@ const App: React.FC = () => {
                       </main>
                       {filteredStreamers.length === 0 && (
                         <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
-                          <h3 className="text-2xl font-bold">{t('noStreamersFoundTitle')}</h3>
-                          <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noStreamersFoundBody')}</p>
+                          <h3 className="text-2xl font-bold" style={{ color: 'var(--text-title)' }}>{t('noStreamersFoundTitle')}</h3>
+                          <p className="mt-2 text-base" style={{ color: 'var(--text-body)' }}>{t('noStreamersFoundBody')}</p>
                         </div>
                       )}
                     </>
@@ -827,7 +897,7 @@ const App: React.FC = () => {
                             <button onClick={handleCopyLinks} disabled={isCopyButtonDisabled} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
                               {isLinksCopied ? ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg><span>{t('copied')}</span></> ) : ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><span>{copyButtonText}</span></> )}
                             </button>
-                            <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm text-black/80 dark:text-white/80">
+                            <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm">
                               <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400 animate-[pulse-live_2s_infinite]"></span><span>{t('liveSoonCount', { count: scheduleStats.liveSoonCount })}</span></span>
                               <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-orange-400 animate-[pulse-scheduled_2s_infinite]"></span><span>{t('scheduledCount', { count: scheduleStats.scheduledCount })}</span></span>
                             </div>
@@ -929,12 +999,12 @@ const App: React.FC = () => {
                     </main>
                 ) : (
                     <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
-                        <h3 className="text-2xl font-bold">{t('noStreamersSelectedTitle')}</h3>
-                        <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noStreamersSelectedBody')}</p>
+                        <h3 className="text-2xl font-bold" style={{ color: 'var(--text-title)' }}>{t('noStreamersSelectedTitle')}</h3>
+                        <p className="mt-2 text-base" style={{ color: 'var(--text-body)' }}>{t('noStreamersSelectedBody')}</p>
                     </div>
                 )}
               </div>
-          ) : ( // Favorites view
+          ) : view === 'favorites' ? (
                 <>
                     <div className="relative z-10 space-y-6 mb-6">
                         <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '150ms' }}>
@@ -947,7 +1017,7 @@ const App: React.FC = () => {
                                    <span>{t('clearFavorites')}</span>
                                 </button>
                             </div>
-                            <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm text-black/80 dark:text-white/80 border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
+                            <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
                                 <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400"></span><span>{t('liveCount', { count: favoritesLiveCount })}</span></span>
                                 <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
                                 <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-red-500"></span><span>{t('offlineCount', { count: favoritesOfflineCount })}</span></span>
@@ -1010,17 +1080,34 @@ const App: React.FC = () => {
                         </main>
                     ) : (
                          <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
-                          <h3 className="text-2xl font-bold">{t('noFavoritesTitle')}</h3>
-                          <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noFavoritesBody')}</p>
+                          <h3 className="text-2xl font-bold" style={{ color: 'var(--text-title)' }}>{t('noFavoritesTitle')}</h3>
+                          <p className="mt-2 text-base" style={{ color: 'var(--text-body)' }}>{t('noFavoritesBody')}</p>
                         </div>
                     )}
                 </>
-          )}
+          ) : null }
         </div>
       </div>
       <StreamerModal streamer={selectedStreamer} onClose={() => setSelectedStreamer(null)} />
       {ENABLE_APPLY_SECTION && <ApplySection />}
       <Footer />
+      {showScrollBtn && (
+        <button
+          onClick={handleScrollButtonClick}
+          className="fixed bottom-6 right-6 rtl:right-auto rtl:left-6 z-50 p-3 rounded-full bg-white/10 dark:bg-black/20 text-black dark:text-white backdrop-blur-lg border border-white/10 shadow-lg hover:bg-white/20 dark:hover:bg-black/30 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-offset-slate-900 transition-all duration-300 transform hover:scale-110 active:scale-95"
+          aria-label={isAtTop ? t('scrollToBottom') : t('scrollToTop')}
+        >
+          {isAtTop ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v17" />
+            </svg>
+          )}
+        </button>
+      )}
     </div>
   );
 };

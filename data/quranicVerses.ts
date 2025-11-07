@@ -1,8 +1,9 @@
 export interface QuranicVerse {
   verse: string;
-  source: string;
-  interpretation: string;
-  translation: string; // For reference
+  // FIX: Made source, interpretation, and translation optional to be compatible with CustomVerse type.
+  source?: string;
+  interpretation?: string;
+  translation?: string; // For reference
 }
 
 export const quranicVerses: QuranicVerse[] = [
@@ -13,7 +14,7 @@ export const quranicVerses: QuranicVerse[] = [
     translation: 'God promises that after every hardship comes ease. Every difficulty is followed by relief, and God repeats this to emphasize that relief is guaranteed.'
   },
   {
-    verse: '﴿ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا ﴾',
+    verse: '﴿ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُsْعَهَا ﴾',
     source: '📖 سورة البقرة – الآية 286',
     interpretation: '💬 التفسير: الله سبحانه لا يحمّل عباده ما لا يستطيعون تحمّله. كل ابتلاء أو تعب هو في حدود قدرتك، فلا تخف، لأن الله يعرف طاقتك أكثر مما تعرفها أنت.',
     translation: 'God does not burden anyone beyond their capacity. Every trial or difficulty is within your limits, so do not fear, for God knows your strength better than you do.'
@@ -49,7 +50,7 @@ export const quranicVerses: QuranicVerse[] = [
     translation: 'God watches over you at all times, knowing your intentions, actions, and stillness. His oversight is not only for fear but also reassurance that you are never alone.'
   },
   {
-    verse: '﴿ الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ ۗ أَلَا بِذْكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ ﴾',
+    verse: '﴿ الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ ۗ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ ﴾',
     source: '📖 سورة الرعد – الآية 28',
     interpretation: '💬 التفسير: راحة البال الحقيقية تنولد من ذكر الله. كل همّ، كل قلق، يذوب لما تذكر ربك، لأن الذكر يعيدك للاتزان النفسي.',
     translation: 'True peace of heart comes from remembering God. Every worry or anxiety dissolves when you remember Him, as remembrance restores inner balance.'
