@@ -79,7 +79,7 @@ const StatusBadge: React.FC<{ isLive: boolean; viewerCount: number | null; categ
       aria-label={isLive ? t('live') : t('offline')}
       role="status"
     >
-      <span className={`h-2.5 w-2.5 rounded-full transition-colors duration-500 ${isLive ? 'bg-green-400 animate-[pulse-live_2s_infinite]' : 'bg-red-500 animate-[slow-fade_3s_ease-in-out_infinite]'}`}></span>
+      <span className={`h-2.5 w-2.5 rounded-full ${isLive ? 'bg-green-400 animate-pulse-glow pulse-green' : 'bg-red-500 animate-offline-glow'}`}></span>
       <span className="flex-shrink-0">{isLive ? t('live') : t('offline')}</span>
       {isLive && viewerCount !== null && (
         <>
@@ -256,8 +256,7 @@ export const StreamerCard: React.FC<StreamerCardProps> = ({ streamer, onCardClic
                    target="_blank"
                    rel="noopener noreferrer"
                    onClick={(e) => e.stopPropagation()}
-                   className={`flex-shrink-0 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50
-                   ${streamer.is_live ? 'shadow-[0_0_15px_rgba(52,211,153,0.7)] hover:shadow-[0_0_20px_rgba(52,211,153,0.9)]' : ''}`}
+                   className="flex-shrink-0 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
                >
                    {t('link')}
                </a>

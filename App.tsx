@@ -12,6 +12,7 @@ import { quranicVerses } from './data/quranicVerses';
 import type { QuranicVerse as VerseType } from './data/quranicVerses';
 import { QuranicVerse } from './components/QuranicVerse';
 import { ScheduledStreams } from './components/ScheduledStreams';
+import { Sidebar } from './components/Sidebar';
 
 // LanguageToggle Component
 const LanguageToggle: React.FC = () => {
@@ -96,7 +97,7 @@ const Footer: React.FC = () => {
     );
 
     return (
-        <footer className="text-center py-8 text-black/80 dark:text-white/80">
+        <footer id="credits-footer" className="text-center py-8 text-black/80 dark:text-white/80">
             <h3 className="text-xl font-semibold mb-6">{t('footerTitle')}</h3>
             <div className="flex justify-center items-start gap-12 md:gap-24">
                 {/* Mohammed */}
@@ -148,9 +149,14 @@ const App: React.FC = () => {
   const [randomVerse, setRandomVerse] = useState<VerseType | null>(null);
   
   const [view, setView] = useState<'live' | 'scheduled'>('live');
+  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+  const isTransitioningRef = useRef(false);
   const [scheduleStats, setScheduleStats] = useState<{ liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }>({ liveSoonCount: 0, scheduledCount: 0, liveSoonLinks: [] });
   const [scheduleSearchQuery, setScheduleSearchQuery] = useState('');
   const [scheduleSortOption, setScheduleSortOption] = useState<'soonest' | 'status'>('soonest');
+  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isTagFilterOpen, setIsTagFilterOpen] = useState(false);
   
   // Notification State
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | null>(null);
@@ -211,6 +217,20 @@ const App: React.FC = () => {
     const tags = KICK_STREAMERS.flatMap(streamer => streamer.tags);
     return [...new Set(tags)].sort();
   }, []);
+  
+  const tagCounts = useMemo(() => {
+    if (!streamerData?.data) return {};
+    const counts: { [key: string]: number } = {};
+    KICK_STREAMERS.forEach(streamerInfo => {
+        const streamerOnline = streamerData.data.find(s => s.username.toLowerCase() === streamerInfo.username.toLowerCase());
+        if (streamerOnline) {
+            streamerInfo.tags?.forEach(tag => {
+                counts[tag] = (counts[tag] || 0) + 1;
+            });
+        }
+    });
+    return counts;
+  }, [streamerData]);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -370,32 +390,77 @@ const App: React.FC = () => {
     
   const isCopyButtonDisabled = view === 'scheduled' && scheduleStats.liveSoonLinks.length === 0;
   
-  const toggleView = () => setView(current => current === 'live' ? 'scheduled' : 'live');
+  const toggleView = () => {
+    if (isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
+    
+    setIsAnimatingOut(true);
+    
+    setTimeout(() => {
+        setView(current => (current === 'live' ? 'scheduled' : 'live'));
+        setIsAnimatingOut(false);
+        setTimeout(() => {
+            isTransitioningRef.current = false;
+        }, 50);
+    }, 300); // Must match CSS animation duration
+  };
   
   const handleScheduleStatsUpdate = useCallback((stats: { liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }) => {
     setScheduleStats(stats);
   }, []);
+  
+  const handleSidebarNavigate = (section: 'live' | 'scheduled' | 'credits') => {
+    if (section === view) {
+        // If already on the view, just close sidebar.
+        // Or if it's credits, scroll.
+    } else if (section !== 'credits') {
+        toggleView();
+    }
+    
+    if (section === 'credits') {
+      document.getElementById('credits-footer')?.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    setIsSidebarOpen(false);
+  };
+
 
   return (
     <div className="min-h-screen w-full text-black/90 transition-colors duration-300 dark:text-white/90">
       <div className="fixed top-0 left-0 w-full h-full -z-10"></div>
+      
+      <div 
+        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setIsSidebarOpen(false)}
+      ></div>
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onNavigate={handleSidebarNavigate} activeView={view} />
+
       <div className="container mx-auto px-4 py-8">
         <header className="flex flex-col items-center mb-8 relative">
           <div className="absolute top-0 right-0 rtl:right-auto rtl:left-0 flex items-center gap-2">
             <NotificationsToggle enabled={areAnyNotificationsEnabled} onToggle={handleToggleAllNotifications} permission={notificationPermission} />
             <LanguageToggle />
             <ThemeToggle />
+             <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-2 rounded-full bg-black/10 dark:bg-white/10 text-black dark:text-white backdrop-blur-sm transition-colors"
+                aria-label={t('openMenu')}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
           </div>
           <img 
-            src="https://i.postimg.cc/g2mhxC8q/vas-AGbotko-OBs.png" 
+            src="https://i.postimg.cc/g2mhxC8q/vas_AGbotko-OBs.png" 
             alt="CIA Logo" 
             className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg mb-4 transform -translate-x-3"
-             />
+          />
           <h1 className="text-5xl font-bold tracking-[0.5em] text-black dark:text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
             C I A
           </h1>
-          <h2 className="text-xl font-semibold text-black/80 dark:text-white/80 mt-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            {t('liveStreams')}
+          <h2 className="text-xl font-semibold text-black/80 dark:text-white/80 mt-2" style={{ fontFamily: "'Poppins', sans-serif", transform: 'translateX(-10px)' }}>
+            {view === 'live' ? t('liveStreams') : t('scheduleStreams')}
           </h2>
 
           {randomVerse && <QuranicVerse verse={randomVerse} />}
@@ -407,167 +472,179 @@ const App: React.FC = () => {
           )}
         </header>
 
-        <div className="my-6 space-y-8">
-            {streamerData && (
-              view === 'live' ? (
-                // LIVE VIEW CONTROLS
-                <div className="space-y-6">
-                  <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-center gap-4">
-                    <div className="relative w-full">
-                      <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                      </span>
-                      <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('searchStreamer')} className="w-full py-3 pl-11 pr-4 rtl:pl-4 rtl:pr-11 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all" aria-label={t('searchStreamer')} />
-                    </div>
-                    <TagFilter allTags={allTags} selectedTags={selectedTags} onSelectedTagsChange={setSelectedTags} />
-                    <div className="relative w-full">
-                      <select value={sortOption} onChange={(e) => setSortOption(e.target.value as any)} className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none" aria-label={t('sortBy')}>
-                        <option value="status">{t('sortByStatus')}</option>
-                        <option value="viewers_desc">{t('viewersHighToLow')}</option>
-                        <option value="live_duration_desc">{t('sortByLiveDuration')}</option>
-                        <option value="last_seen_desc">{t('sortByLastSeen')}</option>
-                      </select>
-                      <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm text-black/80 dark:text-white/80">
-                      <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400"></span><span>{t('liveCount', { count: liveCount })}</span></span>
-                      <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-red-500"></span><span>{t('offlineCount', { count: offlineCount })}</span></span>
-                      <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-gray-500"></span><span>{t('inactiveCount', { count: inactiveCount })}</span></span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                // SCHEDULED VIEW CONTROLS
-                <div className="space-y-6">
-                  <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-                    <div className="relative w-full">
-                      <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                      </span>
-                      <input type="search" value={scheduleSearchQuery} onChange={(e) => setScheduleSearchQuery(e.target.value)} placeholder={t('searchSchedules')} className="w-full py-3 pl-11 pr-4 rtl:pl-4 rtl:pr-11 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all" aria-label={t('searchSchedules')} />
-                    </div>
-                    <div className="relative w-full">
-                      <select value={scheduleSortOption} onChange={(e) => setScheduleSortOption(e.target.value as 'soonest' | 'status')} className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none" aria-label={t('sortBy')}>
-                        <option value="soonest">{t('sortBySoonest')}</option>
-                        <option value="status">{t('sortByStatusScheduled')}</option>
-                      </select>
-                       <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center gap-4">
-                    <button onClick={handleCopyLinks} disabled={isCopyButtonDisabled} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
-                      {isLinksCopied ? ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg><span>{t('copied')}</span></> ) : ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><span>{copyButtonText}</span></> )}
-                    </button>
-                    <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm text-black/80 dark:text-white/80">
-                      <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400 animate-[pulse-live_2s_infinite]"></span><span>{t('liveSoonCount', { count: scheduleStats.liveSoonCount })}</span></span>
-                      <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-orange-400 animate-[pulse-scheduled_2s_infinite]"></span><span>{t('scheduledCount', { count: scheduleStats.scheduledCount })}</span></span>
-                    </div>
-                  </div>
-                </div>
-              )
-            )}
-
-            <div className="w-full flex justify-center">
-                <button onClick={toggleView} className="flex items-center group cursor-pointer text-black/80 dark:text-white/80 hover:text-black dark:hover:text-white transition-colors duration-300">
-                    {view === 'live' ? (
+        <div
+          key={view}
+          className="animation-container mt-8"
+        >
+          {view === 'live' ? (
+              <>
+                  <div className="relative z-10 space-y-6 mb-6">
+                    {streamerData && (
                         <>
-                            <span className="text-lg font-semibold whitespace-nowrap order-1 rtl:order-2">{t('scheduleStreams')}</span>
-                            <div className="w-24 md:w-32 h-0.5 bg-current relative mx-4 order-2 rtl:order-1 transition-all duration-300 group-hover:w-28 md:group-hover:w-36">
-                               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 -mr-3 rtl:mr-0 rtl:-ml-3 transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                                </svg>
+                          <div className="w-full max-w-6xl mx-auto space-y-4">
+                            {/* Search Input */}
+                            <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '0ms' }}>
+                              <div className="relative w-full">
+                                <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
+                                  <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                </span>
+                                <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('searchStreamer')} className="w-full py-3 pl-11 pr-4 rtl:pl-4 rtl:pr-11 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all" aria-label={t('searchStreamer')} />
+                              </div>
                             </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="w-24 md:w-32 h-0.5 bg-current relative mx-4 order-1 rtl:order-2 transition-all duration-300 group-hover:w-28 md:group-hover:w-36">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 absolute left-0 rtl:left-auto rtl:right-0 top-1/2 -translate-y-1/2 -ml-3 rtl:ml-0 rtl:-mr-3 transition-transform duration-300 group-hover:-translate-x-1 rtl:group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                                </svg>
-                            </div>
-                            <span className="text-lg font-semibold whitespace-nowrap order-2 rtl:order-1">{t('liveStreams')}</span>
-                        </>
-                    )}
-                </button>
-            </div>
-        </div>
 
-        {view === 'live' ? (
-            <>
-                {error && (
-                  <div className="text-center bg-red-500/20 text-red-300 p-4 rounded-lg mb-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <div>
-                        <p><strong>{t('apiErrorTitle')}</strong> {error}</p>
-                        <p>{t('apiErrorBody')}</p>
-                    </div>
-                    <button
-                        onClick={fetchData}
-                        disabled={isLoading}
-                        className="rounded-lg px-4 py-2 text-sm font-semibold bg-red-400/20 text-white hover:bg-red-400/40 transition-colors disabled:opacity-50 disabled:cursor-wait"
-                    >
-                        {t('retry')}
-                    </button>
-                  </div>
-                )}
-
-                {isLoading && !streamerData ? (
-                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {Array.from({ length: 8 }).map((_, index) => (
-                        <div key={index} className="rounded-2xl border border-white/20 bg-white/5 p-5 shadow-lg backdrop-blur-lg animate-pulse">
-                            <div className="absolute left-4 top-4 rtl:left-auto rtl:right-4 h-8 w-24 rounded-full bg-black/20 dark:bg-white/10"></div>
-                            <div className="flex items-center gap-4 mt-12">
-                                <div className="h-16 w-16 rounded-full bg-black/20 dark:bg-white/10"></div>
-                                <div className="flex-1 space-y-3">
-                                    <div className="h-4 w-3/4 rounded bg-black/20 dark:bg-white/10"></div>
-                                    <div className="h-3 w-1/2 rounded bg-black/20 dark:bg-white/10"></div>
+                            {/* Filters and Sort */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
+                              <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} ${isTagFilterOpen ? 'relative z-20' : 'relative'}`} style={{ animationDelay: '50ms' }}>
+                                <TagFilter 
+                                  allTags={allTags} 
+                                  selectedTags={selectedTags} 
+                                  onSelectedTagsChange={setSelectedTags} 
+                                  tagCounts={tagCounts} 
+                                  onOpenChange={setIsTagFilterOpen}
+                                />
+                              </div>
+                              <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
+                                <div className="relative w-full">
+                                  <select value={sortOption} onChange={(e) => setSortOption(e.target.value as any)} className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none" aria-label={t('sortBy')}>
+                                    <option value="status">{t('sortByStatus')}</option>
+                                    <option value="viewers_desc">{t('viewersHighToLow')}</option>
+                                    <option value="live_duration_desc">{t('sortByLiveDuration')}</option>
+                                    <option value="last_seen_desc">{t('sortByLastSeen')}</option>
+                                  </select>
+                                  <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
+                                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>
+                                  </span>
                                 </div>
+                              </div>
                             </div>
-                            <div className="mt-4 h-3 w-full rounded bg-black/20 dark:bg-white/10"></div>
-                            <div className="mt-2 h-3 w-2/3 rounded bg-black/20 dark:bg-white/10"></div>
-                        </div>
-                    ))}
-                    </div>
-                ) : streamerData ? (
-                  <>
-                    <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                      {filteredStreamers.map((streamer) => (
-                        <StreamerCard 
-                          key={streamer.username} 
-                          streamer={streamer} 
-                          onCardClick={() => setSelectedStreamer(streamer)}
-                          isNotificationSubscribed={!!streamerNotificationSettings[streamer.username]}
-                          onNotificationToggle={updateStreamerNotificationSetting}
-                          notificationPermission={notificationPermission}
-                        />
-                      ))}
-                    </main>
-                    {filteredStreamers.length === 0 && (
-                      <div className="text-center py-16 text-black/80 dark:text-white/80">
-                        <h3 className="text-2xl font-bold">{t('noStreamersFoundTitle')}</h3>
-                        <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noStreamersFoundBody')}</p>
-                      </div>
+                          </div>
+                          
+                          {/* Live Stats */}
+                          <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '150ms' }}>
+                            <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm text-black/80 dark:text-white/80 border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
+                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400"></span><span>{t('liveCount', { count: liveCount })}</span></span>
+                              <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
+                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-red-500"></span><span>{t('offlineCount', { count: offlineCount })}</span></span>
+                              <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
+                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-gray-500"></span><span>{t('inactiveCount', { count: inactiveCount })}</span></span>
+                            </div>
+                          </div>
+                        </>
                     )}
-                  </>
-                ) : null}
-            </>
-        ) : (
-            <ScheduledStreams 
-                streamerData={streamerData}
-                onCardClick={setSelectedStreamer}
-                streamerNotificationSettings={streamerNotificationSettings}
-                onNotificationToggle={updateStreamerNotificationSetting}
-                notificationPermission={notificationPermission}
-                onStatsUpdate={handleScheduleStatsUpdate}
-                searchQuery={scheduleSearchQuery}
-                sortOption={scheduleSortOption}
-            />
-        )}
+                  </div>
+                  {error && (
+                    <div className={`text-center bg-red-500/20 text-red-300 p-4 rounded-lg mb-8 flex flex-col sm:flex-row items-center justify-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '0ms' }}>
+                      <div>
+                          <p><strong>{t('apiErrorTitle')}</strong> {error}</p>
+                          <p>{t('apiErrorBody')}</p>
+                      </div>
+                      <button
+                          onClick={fetchData}
+                          disabled={isLoading}
+                          className="rounded-lg px-4 py-2 text-sm font-semibold bg-red-400/20 text-white hover:bg-red-400/40 transition-colors disabled:opacity-50 disabled:cursor-wait"
+                      >
+                          {t('retry')}
+                      </button>
+                    </div>
+                  )}
+
+                  {isLoading && !streamerData ? (
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {Array.from({ length: 8 }).map((_, index) => (
+                          <div key={index} className="rounded-2xl border border-white/20 bg-white/5 p-5 shadow-lg backdrop-blur-lg animate-pulse">
+                              <div className="absolute left-4 top-4 rtl:left-auto rtl:right-4 h-8 w-24 rounded-full bg-black/20 dark:bg-white/10"></div>
+                              <div className="flex items-center gap-4 mt-12">
+                                  <div className="h-16 w-16 rounded-full bg-black/20 dark:bg-white/10"></div>
+                                  <div className="flex-1 space-y-3">
+                                      <div className="h-4 w-3/4 rounded bg-black/20 dark:bg-white/10"></div>
+                                      <div className="h-3 w-1/2 rounded bg-black/20 dark:bg-white/10"></div>
+                                  </div>
+                              </div>
+                              <div className="mt-4 h-3 w-full rounded bg-black/20 dark:bg-white/10"></div>
+                              <div className="mt-2 h-3 w-2/3 rounded bg-black/20 dark:bg-white/10"></div>
+                          </div>
+                      ))}
+                      </div>
+                  ) : streamerData ? (
+                    <>
+                      <main
+                        key={`live-grid-${sortOption}-${searchQuery}-${selectedTags.join('_')}`}
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                      >
+                        {filteredStreamers.map((streamer, index) => (
+                          <div key={streamer.username} className={isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} style={{ animationDelay: `${200 + index * 30}ms` }}>
+                              <StreamerCard 
+                                streamer={streamer} 
+                                onCardClick={() => setSelectedStreamer(streamer)}
+                                isNotificationSubscribed={!!streamerNotificationSettings[streamer.username]}
+                                onNotificationToggle={updateStreamerNotificationSetting}
+                                notificationPermission={notificationPermission}
+                              />
+                          </div>
+                        ))}
+                      </main>
+                      {filteredStreamers.length === 0 && (
+                        <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
+                          <h3 className="text-2xl font-bold">{t('noStreamersFoundTitle')}</h3>
+                          <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noStreamersFoundBody')}</p>
+                        </div>
+                      )}
+                    </>
+                  ) : null}
+              </>
+          ) : (
+              <>
+                  <div className="space-y-8 mb-6">
+                     {streamerData && (
+                        <div className="space-y-6">
+                          <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-4">
+                            <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '0ms' }}>
+                              <div className="relative w-full">
+                                <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
+                                  <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                </span>
+                                <input type="search" value={scheduleSearchQuery} onChange={(e) => setScheduleSearchQuery(e.target.value)} placeholder={t('searchSchedules')} className="w-full py-3 pl-11 pr-4 rtl:pl-4 rtl:pr-11 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all" aria-label={t('searchSchedules')} />
+                              </div>
+                            </div>
+                            <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '50ms' }}>
+                              <div className="relative w-full">
+                                <select value={scheduleSortOption} onChange={(e) => setScheduleSortOption(e.target.value as 'soonest' | 'status')} className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none" aria-label={t('sortBy')}>
+                                  <option value="soonest">{t('sortBySoonest')}</option>
+                                  <option value="status">{t('sortByStatusScheduled')}</option>
+                                </select>
+                                 <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
+                                  <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
+                            <button onClick={handleCopyLinks} disabled={isCopyButtonDisabled} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                              {isLinksCopied ? ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg><span>{t('copied')}</span></> ) : ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><span>{copyButtonText}</span></> )}
+                            </button>
+                            <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm text-black/80 dark:text-white/80">
+                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400 animate-[pulse-live_2s_infinite]"></span><span>{t('liveSoonCount', { count: scheduleStats.liveSoonCount })}</span></span>
+                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-orange-400 animate-[pulse-scheduled_2s_infinite]"></span><span>{t('scheduledCount', { count: scheduleStats.scheduledCount })}</span></span>
+                            </div>
+                          </div>
+                        </div>
+                     )}
+                  </div>
+                  <ScheduledStreams 
+                      streamerData={streamerData}
+                      onCardClick={setSelectedStreamer}
+                      streamerNotificationSettings={streamerNotificationSettings}
+                      onNotificationToggle={updateStreamerNotificationSetting}
+                      notificationPermission={notificationPermission}
+                      onStatsUpdate={handleScheduleStatsUpdate}
+                      searchQuery={scheduleSearchQuery}
+                      sortOption={scheduleSortOption}
+                      isAnimatingOut={isAnimatingOut}
+                      baseDelay={150}
+                  />
+              </>
+          )}
+        </div>
       </div>
       <StreamerModal streamer={selectedStreamer} onClose={() => setSelectedStreamer(null)} />
       <Footer />

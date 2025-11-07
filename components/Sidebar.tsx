@@ -1,0 +1,80 @@
+import React from 'react';
+import { useLocalization } from '../hooks/useLocalization';
+
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onNavigate: (section: 'live' | 'scheduled' | 'credits') => void;
+  activeView: 'live' | 'scheduled';
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, activeView }) => {
+  const { t } = useLocalization();
+
+  return (
+    <div
+      className={`fixed top-0 right-0 rtl:right-auto rtl:left-0 h-full w-64 sm:w-72 bg-slate-200/80 dark:bg-slate-900/80 backdrop-blur-xl border-l border-r-0 rtl:border-r rtl:border-l-0 border-white/10 shadow-2xl z-50 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
+        ${isOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full'}`
+      }
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="sidebar-title"
+    >
+      <div className="flex flex-col h-full p-6 text-black dark:text-white">
+        <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+                 <img 
+                    src="https://i.postimg.cc/g2mhxC8q/vas_AGbotko-OBs.png" 
+                    alt="CIA Logo" 
+                    className="w-10 h-10 rounded-full border border-white/20"
+                />
+                <h2 id="sidebar-title" className="text-xl font-bold tracking-widest">C I A</h2>
+            </div>
+          
+          <button onClick={onClose} aria-label={t('close')}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <hr className="border-t border-black/10 dark:border-white/10 mb-6" />
+
+        <nav>
+          <ul className="space-y-2">
+            <li>
+              <button
+                onClick={() => onNavigate('live')}
+                className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'live' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
+              >
+                {t('sidebarLiveStreams')}
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => onNavigate('scheduled')}
+                className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'scheduled' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
+              >
+                {t('sidebarScheduleStreams')}
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => onNavigate('credits')}
+                className="w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              >
+                {t('sidebarCredits')}
+              </button>
+            </li>
+          </ul>
+        </nav>
+
+        <div className="flex-grow"></div>
+
+        <p className="text-center text-sm text-black/70 dark:text-white/70 mt-auto">
+            {t('sidebarThanks')}
+        </p>
+      </div>
+    </div>
+  );
+};

@@ -78,5 +78,12 @@
   "footerTitle": "شكر خاص لـ",
   "copyDiscordId": "انسخ معرف الديسكورد",
   "discordIdCopied": "تم نسخ المعرف!",
-  "retry": "إعادة المحاولة"
+  "retry": "إعادة المحاولة",
+  "openMenu": "فتح القائمة",
+  "sidebarLiveStreams": "البثوث المباشرة",
+  "sidebarScheduleStreams": "البثوث المجدولة",
+  "sidebarCredits": "شكر خاص",
+  "sidebarThanks": "شكرًا لزيارتكم",
+  "clearAll": "مسح الكل",
+  "noTagsFound": "لم يتم العثور على علامات"
 }

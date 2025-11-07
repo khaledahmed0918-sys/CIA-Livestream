@@ -78,5 +78,12 @@
   "footerTitle": "Credits For",
   "copyDiscordId": "Copy Discord ID",
   "discordIdCopied": "Discord ID Copied!",
-  "retry": "Retry"
+  "retry": "Retry",
+  "openMenu": "Open Menu",
+  "sidebarLiveStreams": "Live Streams",
+  "sidebarScheduleStreams": "Schedule Streams",
+  "sidebarCredits": "Credits",
+  "sidebarThanks": "Thanks For Visiting Us",
+  "clearAll": "Clear All",
+  "noTagsFound": "No tags found"
 }

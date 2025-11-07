@@ -1,4 +1,3 @@
-
 export const KICK_STREAMERS: { username: string; tags: string[]; character: string }[] = [
   { username: 'SXB', tags: ['CIA', 'CIA Leaders', 'DO Commander', 'DO'], character: 'Abdulsamad Alqurashi' },
   { username: 'https://kick.com/ysmo', tags: ['CIA', 'CIA Deputy', 'CIA Leaders'], character: 'Agent X' },

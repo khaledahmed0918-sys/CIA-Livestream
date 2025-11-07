@@ -78,8 +78,8 @@ export const ScheduledStreamCard: React.FC<ScheduledStreamCardProps> = ({ schedu
   const isLiveSoon = timeUntilLive > 0 && timeUntilLive <= 30 * 60 * 1000;
 
   const status = isLiveSoon 
-    ? { text: t('liveSoon'), color: 'bg-green-400', animation: 'animate-[pulse-live_2s_infinite]' } 
-    : { text: t('scheduled'), color: 'bg-orange-400', animation: 'animate-[pulse-scheduled_2s_infinite]' };
+    ? { text: t('liveSoon'), color: 'bg-green-400', animation: 'animate-pulse-glow pulse-green' } 
+    : { text: t('scheduled'), color: 'bg-orange-400', animation: 'animate-pulse-glow pulse-orange' };
 
   const formatCountdown = () => {
     const parts = [];

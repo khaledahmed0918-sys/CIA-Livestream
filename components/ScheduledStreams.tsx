@@ -13,6 +13,8 @@ interface ScheduledStreamsProps {
   onStatsUpdate: (stats: { liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }) => void;
   searchQuery: string;
   sortOption: 'soonest' | 'status';
+  isAnimatingOut: boolean;
+  baseDelay: number;
 }
 
 export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
@@ -24,7 +26,9 @@ export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
         notificationPermission,
         onStatsUpdate,
         searchQuery,
-        sortOption
+        sortOption,
+        isAnimatingOut,
+        baseDelay
     } = props;
     const [schedules, setSchedules] = useState<ScheduledStreamType[]>([]);
     const { t } = useLocalization();
@@ -111,7 +115,7 @@ export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
 
     if (schedules.length === 0) {
         return (
-            <div className="text-center py-16 text-black/80 dark:text-white/80">
+            <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-fall-out' : 'animate-fall-in'}`} style={{ animationDelay: `${baseDelay}ms` }}>
                 <h3 className="text-2xl font-bold">{t('noSchedulesTitle')}</h3>
                 <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noSchedulesBody')}</p>
             </div>
@@ -120,7 +124,7 @@ export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
     
     if (filteredAndSortedSchedules.length === 0) {
         return (
-             <div className="text-center py-16 text-black/80 dark:text-white/80">
+             <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-fall-out' : 'animate-fall-in'}`} style={{ animationDelay: `${baseDelay}ms` }}>
                 <h3 className="text-2xl font-bold">{t('noStreamersFoundTitle')}</h3>
                 <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noStreamersFoundBody')}</p>
             </div>
@@ -130,15 +134,16 @@ export const ScheduledStreams: React.FC<ScheduledStreamsProps> = (props) => {
     return (
         <div className="w-full">
             <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredAndSortedSchedules.map(schedule => (
-                     <ScheduledStreamCard 
-                        key={schedule.id} 
-                        schedule={schedule} 
-                        onCardClick={() => onCardClick(schedule.streamer)}
-                        isNotificationSubscribed={!!streamerNotificationSettings[schedule.streamer.username]}
-                        onNotificationToggle={onNotificationToggle}
-                        notificationPermission={notificationPermission}
-                    />
+                {filteredAndSortedSchedules.map((schedule, index) => (
+                     <div key={schedule.id} className={`${isAnimatingOut ? 'animate-fall-out' : 'animate-fall-in'}`} style={{ animationDelay: `${baseDelay + index * 30}ms` }}>
+                        <ScheduledStreamCard 
+                            schedule={schedule} 
+                            onCardClick={() => onCardClick(schedule.streamer)}
+                            isNotificationSubscribed={!!streamerNotificationSettings[schedule.streamer.username]}
+                            onNotificationToggle={onNotificationToggle}
+                            notificationPermission={notificationPermission}
+                        />
+                     </div>
                 ))}
             </main>
         </div>
