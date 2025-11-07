@@ -835,14 +835,27 @@ const App: React.FC = () => {
                     {hasFavorites ? (
                         <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                            {[...favoriteLiveStreamers, ...favoriteScheduledStreamers].sort((a,b) => {
-                                // Sort live streamers first
-                               const isALive = 'is_live' in a && a.is_live;
-                               const isBLive = 'is_live' in b && b.is_live;
-                               if (isALive && !isBLive) return -1;
-                               if (!isALive && isBLive) return 1;
-                               return 0; // Keep original order for same-status
+                                const isALive = 'is_live' in a && a.is_live;
+                                const isBLive = 'is_live' in b && b.is_live;
+                                if (isALive && !isBLive) return -1;
+                                if (!isALive && isBLive) return 1;
+                                if (isALive && isBLive) {
+                                    return ((b as Channel).viewer_count ?? 0) - ((a as Channel).viewer_count ?? 0);
+                                }
+                                
+                                const isAScheduled = 'startTime' in a;
+                                const isBScheduled = 'startTime' in b;
+                                if (isAScheduled && !isBScheduled) return -1;
+                                if (!isAScheduled && isBScheduled) return 1;
+                                if (isAScheduled && isBScheduled) {
+                                    return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+                                }
+                                
+                                const timeA = (a as Channel).last_stream_start_time ? new Date((a as Channel).last_stream_start_time!).getTime() : 0;
+                                const timeB = (b as Channel).last_stream_start_time ? new Date((b as Channel).last_stream_start_time!).getTime() : 0;
+                                return timeB - timeA;
                            }).map((item, index) => {
-                               if ('streamer' in item) { // It's a ScheduledStream
+                               if ('streamer' in item) { // It's a EnrichedScheduledStream
                                    return (
                                        <div key={item.id} className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: `${200 + index * 30}ms` }}>
                                          <ScheduledStreams.Card 
