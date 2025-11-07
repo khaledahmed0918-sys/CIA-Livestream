@@ -2,6 +2,7 @@
   "liveStreams": "البثوث المباشرة",
   "scheduleStreams": "البثوث المجدولة",
   "favoritesStreams": "البثوث المفضلة",
+  "multiStreamGeneratorTitle": "مولد البث المتعدد المباشر",
   "noSchedulesTitle": "لا توجد بثوث مجدولة",
   "noSchedulesBody": "لا توجد بثوث مجدولة قادمة في الوقت الحالي.",
   "notes": "ملاحظات",
@@ -27,6 +28,8 @@
   "noStreamersFoundBody": "لم تتطابق معايير التصفية مع أي بث.",
   "noFavoritesTitle": "لا توجد مفضلات بعد",
   "noFavoritesBody": "انقر على النجمة بجانب أي ستريمر لإضافته هنا.",
+  "noStreamersSelectedTitle": "لم يتم اختيار أي ستريمر",
+  "noStreamersSelectedBody": "اختر ستريمر واحد أو أكثر من القائمة أعلاه للبدء.",
   "live": "مباشر",
   "offline": "غير متصل",
   "liveCount": "{{count}} مباشر",
@@ -90,6 +93,7 @@
   "sidebarLiveStreams": "البثوث المباشرة",
   "sidebarScheduleStreams": "البثوث المجدولة",
   "sidebarFavorites": "المفضلة",
+  "sidebarMultiStream": "بث متعدد",
   "sidebarCredits": "شكر خاص",
   "sidebarThanks": "شكرًا لزيارتكم",
   "clearAll": "مسح الكل",
@@ -103,5 +107,11 @@
   "experienceTag1": "كتابة التقارير (كتابة وتصميم ملف أو صفحات ورقية حول التقارير الميدانية)",
   "experienceTag2": "الكتابة ( التحليل, التوقعات المستقبلية, الثريدات الخ..)",
   "experienceTag3": "تعديل الصور او الرسم او البوسترات",
-  "experienceTag4": "تعديل المقاطع"
+  "experienceTag4": "تعديل المقاطع",
+  "selectStreamers": "اختر الستريمرز...",
+  "streamersSelected": "تم اختيار {{count}} ستريمرز",
+  "generateMultiStream": "إنشاء رابط البث المتعدد",
+  "multiStreamLink": "رابط البث المتعدد",
+  "copyLink": "نسخ الرابط",
+  "linkCopied": "تم نسخ الرابط!"
 }

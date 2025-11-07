@@ -15,6 +15,7 @@ import { ScheduledStreams } from './components/ScheduledStreams';
 import { Sidebar } from './components/Sidebar';
 import { useFavorites } from './hooks/useFavorites';
 import { EnrichedScheduledStream } from './components/ScheduledStreamCard';
+import { MultiStreamSelector } from './components/MultiStreamSelector';
 
 // LanguageToggle Component
 const LanguageToggle: React.FC = () => {
@@ -264,7 +265,7 @@ const App: React.FC = () => {
   const [isLinksCopied, setIsLinksCopied] = useState(false);
   const [randomVerse, setRandomVerse] = useState<VerseType | null>(null);
   
-  const [view, setView] = useState<'live' | 'scheduled' | 'favorites'>('live');
+  const [view, setView] = useState<'live' | 'scheduled' | 'favorites' | 'multistream'>('live');
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const isTransitioningRef = useRef(false);
   const [scheduleStats, setScheduleStats] = useState<{ enrichedSchedules: EnrichedScheduledStream[], liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }>({ enrichedSchedules: [], liveSoonCount: 0, scheduledCount: 0, liveSoonLinks: [] });
@@ -280,6 +281,11 @@ const App: React.FC = () => {
   
   // Favorites State
   const { favorites, toggleFavorite, clearFavorites, isFavorite, hasFavorites } = useFavorites();
+
+  // Multi Stream State
+  const [multiStreamSelection, setMultiStreamSelection] = useState<string[]>([]);
+  const [multiStreamLink, setMultiStreamLink] = useState<string | null>(null);
+  const [isMultiStreamLinkCopied, setIsMultiStreamLinkCopied] = useState(false);
 
   useEffect(() => {
     // Pick a random verse on mount
@@ -515,6 +521,9 @@ const App: React.FC = () => {
       case 'favorites':
         urlsToCopy = allFavoriteStreamers.map(s => s.profile_url);
         break;
+      case 'multistream':
+        // This button isn't shown in multistream view, but handle just in case
+        return;
     }
   
     const urlsString = urlsToCopy.filter(Boolean).join('\n');
@@ -538,10 +547,15 @@ const App: React.FC = () => {
     
   const isCopyButtonDisabled = (view === 'scheduled' && scheduleStats.liveSoonLinks.length === 0) || (view === 'favorites' && allFavoriteStreamers.length === 0);
   
-  const changeView = (newView: 'live' | 'scheduled' | 'favorites') => {
+  const changeView = (newView: 'live' | 'scheduled' | 'favorites' | 'multistream') => {
     if (isTransitioningRef.current || view === newView) return;
     isTransitioningRef.current = true;
     
+    if (view === 'multistream' && newView !== 'multistream') {
+        setMultiStreamSelection([]);
+        setMultiStreamLink(null);
+    }
+
     setIsAnimatingOut(true);
     
     setTimeout(() => {
@@ -557,8 +571,8 @@ const App: React.FC = () => {
     setScheduleStats(stats);
   }, []);
   
-  const handleSidebarNavigate = (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites') => {
-    if (section === 'live' || section === 'scheduled' || section === 'favorites') {
+  const handleSidebarNavigate = (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites' | 'multistream') => {
+    if (section === 'live' || section === 'scheduled' || section === 'favorites' || section === 'multistream') {
         changeView(section);
     } else if (section === 'credits') {
       document.getElementById('credits-footer')?.scrollIntoView({ behavior: 'smooth' });
@@ -579,8 +593,32 @@ const App: React.FC = () => {
         case 'live': return t('liveStreams');
         case 'scheduled': return t('scheduleStreams');
         case 'favorites': return t('favoritesStreams');
+        case 'multistream': return t('multiStreamGeneratorTitle');
     }
   }
+
+  // Multi-stream logic
+  const selectedMultiStreamers = useMemo(() => {
+      if (!streamerData?.data) return [];
+      return multiStreamSelection
+          .map(username => streamerData.data.find(s => s.username === username))
+          .filter((s): s is Channel => s !== undefined);
+  }, [multiStreamSelection, streamerData]);
+
+  const handleGenerateMultiStreamLink = () => {
+      if (multiStreamSelection.length === 0) return;
+      const usernamesPath = multiStreamSelection.join('/');
+      const link = `https://multikick.com/${usernamesPath}`;
+      setMultiStreamLink(link);
+  };
+
+  const handleCopyMultiStreamLink = () => {
+      if (!multiStreamLink) return;
+      navigator.clipboard.writeText(multiStreamLink).then(() => {
+          setIsMultiStreamLinkCopied(true);
+          setTimeout(() => setIsMultiStreamLinkCopied(false), 2000);
+      });
+  };
 
 
   return (
@@ -630,7 +668,7 @@ const App: React.FC = () => {
 
           {randomVerse && <QuranicVerse verse={randomVerse} />}
 
-          {lastUpdated && (
+          {lastUpdated && view === 'live' && (
              <p className="text-sm text-black/60 dark:text-white/60 mt-4">
                {t('lastUpdated', { time: lastUpdated.toLocaleTimeString() })}
              </p>
@@ -639,7 +677,7 @@ const App: React.FC = () => {
 
         <div
           key={view}
-          className="animation-container mt-8"
+          className="animation-container mt-8 relative z-30" // Added z-index to ensure dropdowns appear over subsequent content
         >
           {view === 'live' ? (
               <>
@@ -812,6 +850,90 @@ const App: React.FC = () => {
                       onToggleFavorite={toggleFavorite}
                   />
               </>
+          ) : view === 'multistream' ? (
+              <div className="space-y-8 mb-6">
+                <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} ${isTagFilterOpen ? 'relative z-[9999]' : ''}`} style={{ animationDelay: '0ms' }}>
+                    <MultiStreamSelector
+                        allStreamers={streamerData?.data || []}
+                        selectedUsernames={multiStreamSelection}
+                        onSelectionChange={setMultiStreamSelection}
+                        onOpenChange={setIsTagFilterOpen}
+                    />
+                </div>
+
+                {multiStreamSelection.length > 0 && (
+                    <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '50ms' }}>
+                        <button
+                            onClick={handleGenerateMultiStreamLink}
+                            className="w-full max-w-sm rounded-xl border border-white/10 bg-white/10 px-8 py-3 text-lg font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
+                        >
+                            {t('generateMultiStream')}
+                        </button>
+                    </div>
+                )}
+                
+                {multiStreamLink && (
+                    <div className={`space-y-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
+                        <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center gap-3">
+                            <a
+                                href={multiStreamLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-grow w-full sm:w-auto flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-base font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 text-left rtl:text-right"
+                            >
+                                <div className="flex -space-x-3 rtl:space-x-reverse overflow-hidden">
+                                    {selectedMultiStreamers.slice(0, 5).map(s => (
+                                        <img key={s.username} src={s.profile_pic || ''} alt={s.display_name} className="h-8 w-8 rounded-full border-2 border-white/50 dark:border-black/50 object-cover inline-block" />
+                                    ))}
+                                    {selectedMultiStreamers.length > 5 && (
+                                       <span className="h-8 w-8 rounded-full border-2 border-white/50 dark:border-black/50 bg-gray-600 flex items-center justify-center text-xs font-bold">+{selectedMultiStreamers.length - 5}</span>
+                                    )}
+                                </div>
+                                <span className="truncate">{t('multiStreamLink')}</span>
+                            </a>
+                            <button
+                                onClick={handleCopyMultiStreamLink}
+                                className="w-full sm:w-auto flex-shrink-0 flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+                            >
+                                {isMultiStreamLinkCopied ? (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                        <span>{t('linkCopied')}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                        <span>{t('copyLink')}</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                )}
+                
+                {selectedMultiStreamers.length > 0 ? (
+                    <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {selectedMultiStreamers.map((streamer, index) => (
+                           <div key={streamer.username} className={isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} style={{ animationDelay: `${200 + index * 30}ms` }}>
+                              <StreamerCard 
+                                streamer={streamer} 
+                                onCardClick={() => setSelectedStreamer(streamer)}
+                                isNotificationSubscribed={!!streamerNotificationSettings[streamer.username]}
+                                onNotificationToggle={updateStreamerNotificationSetting}
+                                notificationPermission={notificationPermission}
+                                isFavorite={isFavorite(streamer.username)}
+                                onToggleFavorite={toggleFavorite}
+                              />
+                          </div>
+                        ))}
+                    </main>
+                ) : (
+                    <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
+                        <h3 className="text-2xl font-bold">{t('noStreamersSelectedTitle')}</h3>
+                        <p className="mt-2 text-base text-black/60 dark:text-white/60">{t('noStreamersSelectedBody')}</p>
+                    </div>
+                )}
+              </div>
           ) : ( // Favorites view
                 <>
                     <div className="relative z-10 space-y-6 mb-6">

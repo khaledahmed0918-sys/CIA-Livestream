@@ -4,8 +4,8 @@ import { useLocalization } from '../hooks/useLocalization';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigate: (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites') => void;
-  activeView: 'live' | 'scheduled' | 'favorites';
+  onNavigate: (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites' | 'multistream') => void;
+  activeView: 'live' | 'scheduled' | 'favorites' | 'multistream';
   showApplyLink: boolean;
   hasFavorites: boolean;
 }
@@ -70,6 +70,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
                     </button>
                 </li>
             )}
+             <li>
+              <button
+                onClick={() => onNavigate('multistream')}
+                className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'multistream' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
+              >
+                {t('sidebarMultiStream')}
+              </button>
+            </li>
             {showApplyLink && (
                <li>
                 <button
