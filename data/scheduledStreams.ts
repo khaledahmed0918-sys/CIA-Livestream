@@ -11,4 +11,12 @@ const getFutureDate = (days: number, hours: number = 0, minutes: number = 0): st
 
 export const SCHEDULED_STREAMS: ScheduledStream[] = [
 
+      {
+          id: '1',
+          streamerUsername: 'SXB',
+          startTime: getFutureDate(0, 23, 32), // 25 minutes from now
+          notes: 'Just Charring, Playing MTRP in Grand Theft Auto V FiveM.',
+           characters: ['Abdulsamad Alqurashi'],
+      }
+
 ];
