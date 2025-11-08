@@ -8,9 +8,10 @@ interface SidebarProps {
   activeView: 'live' | 'scheduled' | 'favorites' | 'multistream' | 'share';
   showApplyLink: boolean;
   hasFavorites: boolean;
+  showShareStreamLink: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, activeView, showApplyLink, hasFavorites }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, activeView, showApplyLink, hasFavorites, showShareStreamLink }) => {
   const { t } = useLocalization();
 
   return (
@@ -68,14 +69,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
                 {t('sidebarMultiStream')}
               </button>
             </li>
-            <li>
-              <button
-                onClick={() => onNavigate('share')}
-                className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'share' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
-              >
-                {t('sidebarShareStream')}
-              </button>
-            </li>
+            {showShareStreamLink && (
+              <li>
+                <button
+                  onClick={() => onNavigate('share')}
+                  className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'share' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
+                >
+                  {t('sidebarShareStream')}
+                </button>
+              </li>
+            )}
             {hasFavorites && (
                 <li>
                     <button

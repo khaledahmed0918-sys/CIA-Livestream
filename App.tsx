@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { fetchChannelStatuses } from './services/kickService';
 import type { KickApiResponse, Channel } from './types';
-import { KICK_STREAMERS, POLLING_INTERVAL_SECONDS, ENABLE_APPLY_SECTION } from './constants';
+import { KICK_STREAMERS, POLLING_INTERVAL_SECONDS, ENABLE_APPLY_SECTION, ENABLE_SHARE_STREAM_VIEW } from './constants';
 import { StreamerCard } from './StreamerCard';
 import { ThemeToggle } from './components/ThemeToggle';
 import { TagFilter } from './components/TagFilter';
@@ -710,6 +710,7 @@ const App: React.FC = () => {
         activeView={view} 
         showApplyLink={ENABLE_APPLY_SECTION}
         hasFavorites={hasFavorites}
+        showShareStreamLink={ENABLE_SHARE_STREAM_VIEW}
       />
 
       <div className="container mx-auto px-4 py-8">

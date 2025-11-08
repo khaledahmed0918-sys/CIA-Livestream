@@ -56,3 +56,5 @@ export const KICK_STREAMERS: { username: string; tags: string[]; character: stri
 export const POLLING_INTERVAL_SECONDS: number = 90;
 
 export const ENABLE_APPLY_SECTION = true;
+
+export const ENABLE_SHARE_STREAM_VIEW = false;
