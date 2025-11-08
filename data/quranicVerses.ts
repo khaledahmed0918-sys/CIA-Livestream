@@ -14,7 +14,7 @@ export const quranicVerses: QuranicVerse[] = [
     translation: 'God promises that after every hardship comes ease. Every difficulty is followed by relief, and God repeats this to emphasize that relief is guaranteed.'
   },
   {
-    verse: '﴿ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُsْعَهَا ﴾',
+    verse: '﴿ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسعَهَا ﴾',
     source: '📖 سورة البقرة – الآية 286',
     interpretation: '💬 التفسير: الله سبحانه لا يحمّل عباده ما لا يستطيعون تحمّله. كل ابتلاء أو تعب هو في حدود قدرتك، فلا تخف، لأن الله يعرف طاقتك أكثر مما تعرفها أنت.',
     translation: 'God does not burden anyone beyond their capacity. Every trial or difficulty is within your limits, so do not fear, for God knows your strength better than you do.'
