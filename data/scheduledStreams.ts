@@ -39,7 +39,7 @@ export const SCHEDULED_STREAMS: ScheduledStream[] = [
       id: '1',
       streamerUsername: 'SXB',
       startTime: parseDateTime('2025-11-9, 9:00PM'),
-      notes: 'Just Charring, Playing MTRP in Grand Theft Auto V FiveM.',
+      notes: 'Just Chatting, Playing MTRP in Grand Theft Auto V FiveM.',
        characters: ['Abdulsamad Alqurashi'],
   },
   {
