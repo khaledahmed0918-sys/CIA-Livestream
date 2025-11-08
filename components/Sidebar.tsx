@@ -4,8 +4,8 @@ import { useLocalization } from '../hooks/useLocalization';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigate: (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites' | 'multistream') => void;
-  activeView: 'live' | 'scheduled' | 'favorites' | 'multistream';
+  onNavigate: (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites' | 'multistream' | 'share') => void;
+  activeView: 'live' | 'scheduled' | 'favorites' | 'multistream' | 'share';
   showApplyLink: boolean;
   hasFavorites: boolean;
 }
@@ -34,7 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
             </div>
           
           <button onClick={onClose} aria-label={t('close')}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -60,6 +60,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
                 {t('sidebarScheduleStreams')}
               </button>
             </li>
+             <li>
+              <button
+                onClick={() => onNavigate('multistream')}
+                className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'multistream' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
+              >
+                {t('sidebarMultiStream')}
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => onNavigate('share')}
+                className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'share' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
+              >
+                {t('sidebarShareStream')}
+              </button>
+            </li>
             {hasFavorites && (
                 <li>
                     <button
@@ -70,14 +86,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
                     </button>
                 </li>
             )}
-             <li>
-              <button
-                onClick={() => onNavigate('multistream')}
-                className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'multistream' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
-              >
-                {t('sidebarMultiStream')}
-              </button>
-            </li>
             {showApplyLink && (
                <li>
                 <button

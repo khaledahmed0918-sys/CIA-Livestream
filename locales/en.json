@@ -59,5 +59,8 @@
   "failedToLoadData": "Failed to load data",
   "applyTitle": "Apply For CIA in MTRP Server",
   "applyButton": "Apply",
-  "sidebarApply": "Apply for CIA"
+  "sidebarApply": "Apply for CIA",
+  "sidebarShareStream": "Share Stream",
+  "shareYourStreamTitle": "Share Your Streams",
+  "addStreamWindow": "Add Stream Window"
 }

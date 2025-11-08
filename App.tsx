@@ -18,6 +18,7 @@ import { Sidebar } from './components/Sidebar';
 import { useFavorites } from './hooks/useFavorites';
 import { EnrichedScheduledStream } from './components/ScheduledStreamCard';
 import { MultiStreamSelector } from './components/MultiStreamSelector';
+import { ShareStreamView, WindowData } from './components/ShareStreamView';
 
 // LanguageToggle Component
 const LanguageToggle: React.FC = () => {
@@ -269,7 +270,7 @@ const App: React.FC = () => {
   const [isLinksCopied, setIsLinksCopied] = useState(false);
   const [randomVerse, setRandomVerse] = useState<VerseType | null>(null);
   
-  const [view, setView] = useState<'live' | 'scheduled' | 'favorites' | 'multistream'>('live');
+  const [view, setView] = useState<'live' | 'scheduled' | 'favorites' | 'multistream' | 'share'>('live');
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const isTransitioningRef = useRef(false);
   const [scheduleStats, setScheduleStats] = useState<{ enrichedSchedules: EnrichedScheduledStream[], liveSoonCount: number; scheduledCount: number; liveSoonLinks: string[] }>({ enrichedSchedules: [], liveSoonCount: 0, scheduledCount: 0, liveSoonLinks: [] });
@@ -294,6 +295,12 @@ const App: React.FC = () => {
   // Scroll Button State
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
+
+  // Share Stream View State
+  const [shareViewWindows, setShareViewWindows] = useState<WindowData[]>([]);
+  const [shareViewNextZIndex, setShareViewNextZIndex] = useState(100);
+  const [shareViewExtraSpace, setShareViewExtraSpace] = useState(0);
+
 
   useEffect(() => {
     // Pick a random verse on mount
@@ -587,7 +594,8 @@ const App: React.FC = () => {
         urlsToCopy = allFavoriteStreamers.map(s => s.profile_url);
         break;
       case 'multistream':
-        // This button isn't shown in multistream view, but handle just in case
+      case 'share':
+        // This button isn't shown in these views, but handle just in case
         return;
     }
   
@@ -612,7 +620,7 @@ const App: React.FC = () => {
     
   const isCopyButtonDisabled = (view === 'scheduled' && scheduleStats.liveSoonLinks.length === 0) || (view === 'favorites' && allFavoriteStreamers.length === 0);
   
-  const changeView = (newView: 'live' | 'scheduled' | 'favorites' | 'multistream') => {
+  const changeView = (newView: 'live' | 'scheduled' | 'favorites' | 'multistream' | 'share') => {
     if (isTransitioningRef.current || view === newView) return;
     isTransitioningRef.current = true;
     
@@ -636,8 +644,8 @@ const App: React.FC = () => {
     setScheduleStats(stats);
   }, []);
   
-  const handleSidebarNavigate = (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites' | 'multistream') => {
-    if (section === 'live' || section === 'scheduled' || section === 'favorites' || section === 'multistream') {
+  const handleSidebarNavigate = (section: 'live' | 'scheduled' | 'credits' | 'apply' | 'favorites' | 'multistream' | 'share') => {
+    if (section === 'live' || section === 'scheduled' || section === 'favorites' || section === 'multistream' || section === 'share') {
         changeView(section);
     } else if (section === 'credits') {
       document.getElementById('credits-footer')?.scrollIntoView({ behavior: 'smooth' });
@@ -659,6 +667,7 @@ const App: React.FC = () => {
         case 'scheduled': return t('scheduleStreams');
         case 'favorites': return t('favoritesStreams');
         case 'multistream': return t('multiStreamGeneratorTitle');
+        case 'share': return t('shareYourStreamTitle');
     }
   }
 
@@ -744,350 +753,370 @@ const App: React.FC = () => {
              </p>
           )}
         </header>
+        
+        <div style={{ display: view !== 'share' ? 'block' : 'none' }}>
+            <div
+              key={view}
+              className="animation-container mt-8 relative z-30"
+            >
+              {view === 'live' && (
+                  <>
+                      <div className="relative z-10 space-y-6 mb-6">
+                        {streamerData && (
+                            <>
+                              <div className="w-full max-w-6xl mx-auto space-y-4">
+                                {/* Search Input */}
+                                <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '0ms' }}>
+                                  <div className="relative w-full">
+                                    <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
+                                      <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    </span>
+                                    <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('searchStreamer')} className="w-full py-3 pl-11 pr-4 rtl:pl-4 rtl:pr-11 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all" aria-label={t('searchStreamer')} />
+                                  </div>
+                                </div>
 
-        <div
-          key={view}
-          className="animation-container mt-8 relative z-30" // Added z-index to ensure dropdowns appear over subsequent content
-        >
-          {view === 'live' ? (
-              <>
-                  <div className="relative z-10 space-y-6 mb-6">
-                    {streamerData && (view === 'live' || view === 'favorites' || view === 'multistream') && (
-                        <>
-                          <div className="w-full max-w-6xl mx-auto space-y-4">
-                            {/* Search Input */}
-                            <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '0ms' }}>
-                              <div className="relative w-full">
-                                <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
-                                  <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                </span>
-                                <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('searchStreamer')} className="w-full py-3 pl-11 pr-4 rtl:pl-4 rtl:pr-11 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all" aria-label={t('searchStreamer')} />
-                              </div>
-                            </div>
-
-                            {/* Filters and Sort */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-                              <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} ${isTagFilterOpen ? 'relative z-20' : 'relative'}`} style={{ animationDelay: '50ms' }}>
-                                <TagFilter 
-                                  allTags={allTags} 
-                                  selectedTags={selectedTags} 
-                                  onSelectedTagsChange={setSelectedTags} 
-                                  tagCounts={tagCounts} 
-                                  onOpenChange={setIsTagFilterOpen} 
-                                />
-                              </div>
-                              <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
-                                <div className="relative w-full">
-                                  <select value={sortOption} onChange={(e) => setSortOption(e.target.value as any)} className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none" aria-label={t('sortBy')}>
-                                    <option value="status">{t('sortByStatus')}</option>
-                                    <option value="viewers_desc">{t('viewersHighToLow')}</option>
-                                    <option value="live_duration_desc">{t('sortByLiveDuration')}</option>
-                                    <option value="last_seen_desc">{t('sortByLastSeen')}</option>
-                                  </select>
-                                  <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
-                                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>
-                                  </span>
+                                {/* Filters and Sort */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
+                                  <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} ${isTagFilterOpen ? 'relative z-20' : 'relative'}`} style={{ animationDelay: '50ms' }}>
+                                    <TagFilter 
+                                      allTags={allTags} 
+                                      selectedTags={selectedTags} 
+                                      onSelectedTagsChange={setSelectedTags} 
+                                      tagCounts={tagCounts} 
+                                      onOpenChange={setIsTagFilterOpen} 
+                                    />
+                                  </div>
+                                  <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
+                                    <div className="relative w-full">
+                                      <select value={sortOption} onChange={(e) => setSortOption(e.target.value as any)} className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none" aria-label={t('sortBy')}>
+                                        <option value="status">{t('sortByStatus')}</option>
+                                        <option value="viewers_desc">{t('viewersHighToLow')}</option>
+                                        <option value="live_duration_desc">{t('sortByLiveDuration')}</option>
+                                        <option value="last_seen_desc">{t('sortByLastSeen')}</option>
+                                      </select>
+                                      <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
+                                        <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>
+                                      </span>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </div>
-                          
-                          {/* Live Stats */}
-                          <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '150ms' }}>
-                            <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
-                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400"></span><span>{t('liveCount', { count: liveCount })}</span></span>
-                              <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
-                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-red-500"></span><span>{t('offlineCount', { count: offlineCount })}</span></span>
-                              <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
-                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-gray-500"></span><span>{t('inactiveCount', { count: inactiveCount })}</span></span>
-                            </div>
-                          </div>
-                        </>
-                    )}
-                  </div>
-                  {error && (
-                    <div className={`text-center bg-red-500/20 text-red-300 p-4 rounded-lg mb-8 flex flex-col sm:flex-row items-center justify-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '0ms' }}>
-                      <div>
-                          <p><strong>{t('apiErrorTitle')}</strong> {error}</p>
-                          <p>{t('apiErrorBody')}</p>
-                      </div>
-                      <button
-                          onClick={fetchData}
-                          disabled={isLoading}
-                          className="rounded-lg px-4 py-2 text-sm font-semibold bg-red-400/20 text-white hover:bg-red-400/40 transition-colors disabled:opacity-50 disabled:cursor-wait"
-                      >
-                          {t('retry')}
-                      </button>
-                    </div>
-                  )}
-
-                  {isLoading && !streamerData ? (
-                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                      {Array.from({ length: 8 }).map((_, index) => (
-                          <div key={index} className="rounded-2xl border border-white/20 bg-white/5 p-5 shadow-lg backdrop-blur-lg animate-pulse">
-                              <div className="absolute left-4 top-4 rtl:left-auto rtl:right-4 h-8 w-24 rounded-full bg-black/20 dark:bg-white/10"></div>
-                              <div className="flex items-center gap-4 mt-12">
-                                  <div className="h-16 w-16 rounded-full bg-black/20 dark:bg-white/10"></div>
-                                  <div className="flex-1 space-y-3">
-                                      <div className="h-4 w-3/4 rounded bg-black/20 dark:bg-white/10"></div>
-                                      <div className="h-3 w-1/2 rounded bg-black/20 dark:bg-white/10"></div>
-                                  </div>
+                              
+                              {/* Live Stats */}
+                              <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '150ms' }}>
+                                <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
+                                  <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400"></span><span>{t('liveCount', { count: liveCount })}</span></span>
+                                  <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
+                                  <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-red-500"></span><span>{t('offlineCount', { count: offlineCount })}</span></span>
+                                  <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
+                                  <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-gray-500"></span><span>{t('inactiveCount', { count: inactiveCount })}</span></span>
+                                </div>
                               </div>
-                              <div className="mt-4 h-3 w-full rounded bg-black/20 dark:bg-white/10"></div>
-                              <div className="mt-2 h-3 w-2/3 rounded bg-black/20 dark:bg-white/10"></div>
-                          </div>
-                      ))}
+                            </>
+                        )}
                       </div>
-                  ) : streamerData ? (
-                    <>
-                      <main
-                        key={`live-grid-${sortOption}-${searchQuery}-${selectedTags.join('_')}`}
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                      >
-                        {filteredStreamers.map((streamer, index) => (
-                          <div key={streamer.username} className={isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} style={{ animationDelay: `${200 + index * 30}ms` }}>
-                              <StreamerCard 
-                                streamer={streamer} 
-                                onCardClick={() => setSelectedStreamer(streamer)}
-                                isNotificationSubscribed={!!streamerNotificationSettings[streamer.username]}
-                                onNotificationToggle={updateStreamerNotificationSetting}
-                                notificationPermission={notificationPermission}
-                                isFavorite={isFavorite(streamer.username)}
-                                onToggleFavorite={toggleFavorite}
-                              />
+                      {error && (
+                        <div className={`text-center bg-red-500/20 text-red-300 p-4 rounded-lg mb-8 flex flex-col sm:flex-row items-center justify-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '0ms' }}>
+                          <div>
+                              <p><strong>{t('apiErrorTitle')}</strong> {error}</p>
+                              <p>{t('apiErrorBody')}</p>
                           </div>
-                        ))}
-                      </main>
-                      {filteredStreamers.length === 0 && (
-                        <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
-                          <h3 className="text-2xl font-bold" style={{ color: 'var(--text-title)' }}>{t('noStreamersFoundTitle')}</h3>
-                          <p className="mt-2 text-base" style={{ color: 'var(--text-body)' }}>{t('noStreamersFoundBody')}</p>
+                          <button
+                              onClick={fetchData}
+                              disabled={isLoading}
+                              className="rounded-lg px-4 py-2 text-sm font-semibold bg-red-400/20 text-white hover:bg-red-400/40 transition-colors disabled:opacity-50 disabled:cursor-wait"
+                          >
+                              {t('retry')}
+                          </button>
                         </div>
                       )}
-                    </>
-                  ) : null}
-              </>
-          ) : view === 'scheduled' ? (
-              <>
-                  <div className="space-y-8 mb-6">
-                     {streamerData && (
-                        <div className="space-y-6">
-                          <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-                            <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '0ms' }}>
-                              <div className="relative w-full">
-                                <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
-                                  <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                </span>
-                                <input type="search" value={scheduleSearchQuery} onChange={(e) => setScheduleSearchQuery(e.target.value)} placeholder={t('searchSchedules')} className="w-full py-3 pl-11 pr-4 rtl:pl-4 rtl:pr-11 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all" aria-label={t('searchSchedules')} />
-                              </div>
-                            </div>
-                            <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '50ms' }}>
-                              <div className="relative w-full">
-                                <select value={scheduleSortOption} onChange={(e) => setScheduleSortOption(e.target.value as 'soonest' | 'status')} className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none" aria-label={t('sortBy')}>
-                                  <option value="soonest">{t('sortBySoonest')}</option>
-                                  <option value="status">{t('sortByStatusScheduled')}</option>
-                                </select>
-                                 <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
-                                  <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
-                            <button onClick={handleCopyLinks} disabled={isCopyButtonDisabled} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
-                              {isLinksCopied ? ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg><span>{t('copied')}</span></> ) : ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><span>{copyButtonText}</span></> )}
-                            </button>
-                            <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm">
-                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400 animate-[pulse-live_2s_infinite]"></span><span>{t('liveSoonCount', { count: scheduleStats.liveSoonCount })}</span></span>
-                              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-orange-400 animate-[pulse-scheduled_2s_infinite]"></span><span>{t('scheduledCount', { count: scheduleStats.scheduledCount })}</span></span>
-                            </div>
-                          </div>
-                        </div>
-                     )}
-                  </div>
-                  <ScheduledStreams 
-                      streamerData={streamerData}
-                      onCardClick={setSelectedStreamer}
-                      streamerNotificationSettings={streamerNotificationSettings}
-                      onNotificationToggle={updateStreamerNotificationSetting}
-                      notificationPermission={notificationPermission}
-                      onStatsUpdate={handleScheduleStatsUpdate}
-                      searchQuery={scheduleSearchQuery}
-                      sortOption={scheduleSortOption}
-                      isAnimatingOut={isAnimatingOut}
-                      baseDelay={150}
-                      isFavorite={isFavorite}
-                      onToggleFavorite={toggleFavorite}
-                  />
-              </>
-          ) : view === 'multistream' ? (
-              <div className="space-y-8 mb-6">
-                <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} ${isTagFilterOpen ? 'relative z-[9999]' : ''}`} style={{ animationDelay: '0ms' }}>
-                    <MultiStreamSelector
-                        allStreamers={streamerData?.data || []}
-                        selectedUsernames={multiStreamSelection}
-                        onSelectionChange={setMultiStreamSelection}
-                        onOpenChange={setIsTagFilterOpen}
-                    />
-                </div>
 
-                {multiStreamSelection.length > 0 && (
-                    <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '50ms' }}>
-                        <button
-                            onClick={handleGenerateMultiStreamLink}
-                            className="w-full max-w-sm rounded-xl border border-white/10 bg-white/10 px-8 py-3 text-lg font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
-                        >
-                            {t('generateMultiStream')}
-                        </button>
-                    </div>
-                )}
-                
-                {multiStreamLink && (
-                    <div className={`space-y-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
-                        <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center gap-3">
-                            <a
-                                href={multiStreamLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-grow w-full sm:w-auto flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-base font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 text-left rtl:text-right"
-                            >
-                                <div className="flex -space-x-3 rtl:space-x-reverse overflow-hidden">
-                                    {selectedMultiStreamers.slice(0, 5).map(s => (
-                                        <img key={s.username} src={s.profile_pic || ''} alt={s.display_name} className="h-8 w-8 rounded-full border-2 border-white/50 dark:border-black/50 object-cover inline-block" />
-                                    ))}
-                                    {selectedMultiStreamers.length > 5 && (
-                                       <span className="h-8 w-8 rounded-full border-2 border-white/50 dark:border-black/50 bg-gray-600 flex items-center justify-center text-xs font-bold">+{selectedMultiStreamers.length - 5}</span>
-                                    )}
-                                </div>
-                                <span className="truncate">{t('multiStreamLink')}</span>
-                            </a>
-                            <button
-                                onClick={handleCopyMultiStreamLink}
-                                className="w-full sm:w-auto flex-shrink-0 flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
-                            >
-                                {isMultiStreamLinkCopied ? (
-                                    <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                                        <span>{t('linkCopied')}</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                                        <span>{t('copyLink')}</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                )}
-                
-                {selectedMultiStreamers.length > 0 ? (
-                    <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {selectedMultiStreamers.map((streamer, index) => (
-                           <div key={streamer.username} className={isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} style={{ animationDelay: `${200 + index * 30}ms` }}>
-                              <StreamerCard 
-                                streamer={streamer} 
-                                onCardClick={() => setSelectedStreamer(streamer)}
-                                isNotificationSubscribed={!!streamerNotificationSettings[streamer.username]}
-                                onNotificationToggle={updateStreamerNotificationSetting}
-                                notificationPermission={notificationPermission}
-                                isFavorite={isFavorite(streamer.username)}
-                                onToggleFavorite={toggleFavorite}
-                              />
+                      {isLoading && !streamerData ? (
+                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                          {Array.from({ length: 8 }).map((_, index) => (
+                              <div key={index} className="rounded-2xl border border-white/20 bg-white/5 p-5 shadow-lg backdrop-blur-lg animate-pulse">
+                                  <div className="absolute left-4 top-4 rtl:left-auto rtl:right-4 h-8 w-24 rounded-full bg-black/20 dark:bg-white/10"></div>
+                                  <div className="flex items-center gap-4 mt-12">
+                                      <div className="h-16 w-16 rounded-full bg-black/20 dark:bg-white/10"></div>
+                                      <div className="flex-1 space-y-3">
+                                          <div className="h-4 w-3/4 rounded bg-black/20 dark:bg-white/10"></div>
+                                          <div className="h-3 w-1/2 rounded bg-black/20 dark:bg-white/10"></div>
+                                      </div>
+                                  </div>
+                                  <div className="mt-4 h-3 w-full rounded bg-black/20 dark:bg-white/10"></div>
+                                  <div className="mt-2 h-3 w-2/3 rounded bg-black/20 dark:bg-white/10"></div>
+                              </div>
+                          ))}
                           </div>
-                        ))}
-                    </main>
-                ) : (
-                    <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
-                        <h3 className="text-2xl font-bold" style={{ color: 'var(--text-title)' }}>{t('noStreamersSelectedTitle')}</h3>
-                        <p className="mt-2 text-base" style={{ color: 'var(--text-body)' }}>{t('noStreamersSelectedBody')}</p>
-                    </div>
-                )}
-              </div>
-          ) : view === 'favorites' ? (
-                <>
-                    <div className="relative z-10 space-y-6 mb-6">
-                        <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '150ms' }}>
-                            <div className="flex justify-center items-center flex-wrap gap-4">
+                      ) : streamerData ? (
+                        <>
+                          <main
+                            key={`live-grid-${sortOption}-${searchQuery}-${selectedTags.join('_')}`}
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                          >
+                            {filteredStreamers.map((streamer, index) => (
+                              <div key={streamer.username} className={isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} style={{ animationDelay: `${200 + index * 30}ms` }}>
+                                  <StreamerCard 
+                                    streamer={streamer} 
+                                    onCardClick={() => setSelectedStreamer(streamer)}
+                                    isNotificationSubscribed={!!streamerNotificationSettings[streamer.username]}
+                                    onNotificationToggle={updateStreamerNotificationSetting}
+                                    notificationPermission={notificationPermission}
+                                    isFavorite={isFavorite(streamer.username)}
+                                    onToggleFavorite={toggleFavorite}
+                                  />
+                              </div>
+                            ))}
+                          </main>
+                          {filteredStreamers.length === 0 && (
+                            <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
+                              <h3 className="text-2xl font-bold" style={{ color: 'var(--text-title)' }}>{t('noStreamersFoundTitle')}</h3>
+                              <p className="mt-2 text-base" style={{ color: 'var(--text-body)' }}>{t('noStreamersFoundBody')}</p>
+                            </div>
+                          )}
+                        </>
+                      ) : null}
+                  </>
+              )}
+              {view === 'scheduled' && (
+                  <>
+                      <div className="space-y-8 mb-6">
+                         {streamerData && (
+                            <div className="space-y-6">
+                              <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-4">
+                                <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '0ms' }}>
+                                  <div className="relative w-full">
+                                    <span className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 flex items-center pl-4 rtl:pl-0 rtl:pr-4 pointer-events-none">
+                                      <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    </span>
+                                    <input type="search" value={scheduleSearchQuery} onChange={(e) => setScheduleSearchQuery(e.target.value)} placeholder={t('searchSchedules')} className="w-full py-3 pl-11 pr-4 rtl:pl-4 rtl:pr-11 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 dark:placeholder-gray-400 backdrop-blur-sm transition-all" aria-label={t('searchSchedules')} />
+                                  </div>
+                                </div>
+                                <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '50ms' }}>
+                                  <div className="relative w-full">
+                                    <select value={scheduleSortOption} onChange={(e) => setScheduleSortOption(e.target.value as 'soonest' | 'status')} className="w-full py-3 pl-4 pr-10 rtl:pl-10 rtl:pr-4 text-black bg-white/20 rounded-full border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-white dark:bg-black/20 backdrop-blur-sm transition-all appearance-none" aria-label={t('sortBy')}>
+                                      <option value="soonest">{t('sortBySoonest')}</option>
+                                      <option value="status">{t('sortByStatusScheduled')}</option>
+                                    </select>
+                                     <span className="absolute inset-y-0 right-0 rtl:right-auto rtl:left-0 flex items-center pr-4 rtl:pr-0 rtl:pl-4 pointer-events-none">
+                                      <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
                                 <button onClick={handleCopyLinks} disabled={isCopyButtonDisabled} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
                                   {isLinksCopied ? ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg><span>{t('copied')}</span></> ) : ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><span>{copyButtonText}</span></> )}
                                 </button>
-                                <button onClick={handleClearFavorites} disabled={!hasFavorites} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed text-red-400">
-                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                   <span>{t('clearFavorites')}</span>
-                                </button>
+                                <div className="flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm">
+                                  <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400 animate-[pulse-live_2s_infinite]"></span><span>{t('liveSoonCount', { count: scheduleStats.liveSoonCount })}</span></span>
+                                  <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-orange-400 animate-[pulse-scheduled_2s_infinite]"></span><span>{t('scheduledCount', { count: scheduleStats.scheduledCount })}</span></span>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
-                                <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400"></span><span>{t('liveCount', { count: favoritesLiveCount })}</span></span>
-                                <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
-                                <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-red-500"></span><span>{t('offlineCount', { count: favoritesOfflineCount })}</span></span>
-                            </div>
-                        </div>
+                         )}
+                      </div>
+                      <ScheduledStreams 
+                          streamerData={streamerData}
+                          onCardClick={setSelectedStreamer}
+                          streamerNotificationSettings={streamerNotificationSettings}
+                          onNotificationToggle={updateStreamerNotificationSetting}
+                          notificationPermission={notificationPermission}
+                          onStatsUpdate={handleScheduleStatsUpdate}
+                          searchQuery={scheduleSearchQuery}
+                          sortOption={scheduleSortOption}
+                          isAnimatingOut={isAnimatingOut}
+                          baseDelay={150}
+                          isFavorite={isFavorite}
+                          onToggleFavorite={toggleFavorite}
+                      />
+                  </>
+              )}
+              {view === 'multistream' && (
+                  <div className="space-y-8 mb-6">
+                    <div className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} ${isTagFilterOpen ? 'relative z-[9999]' : ''}`} style={{ animationDelay: '0ms' }}>
+                        <MultiStreamSelector
+                            allStreamers={streamerData?.data || []}
+                            selectedUsernames={multiStreamSelection}
+                            onSelectionChange={setMultiStreamSelection}
+                            onOpenChange={setIsTagFilterOpen}
+                        />
                     </div>
-                    {hasFavorites ? (
-                        <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                           {[...favoriteLiveStreamers, ...favoriteScheduledStreamers].sort((a,b) => {
-                                const isALive = 'is_live' in a && a.is_live;
-                                const isBLive = 'is_live' in b && b.is_live;
-                                if (isALive && !isBLive) return -1;
-                                if (!isALive && isBLive) return 1;
-                                if (isALive && isBLive) {
-                                    return ((b as Channel).viewer_count ?? 0) - ((a as Channel).viewer_count ?? 0);
-                                }
-                                
-                                const isAScheduled = 'startTime' in a;
-                                const isBScheduled = 'startTime' in b;
-                                if (isAScheduled && !isBScheduled) return -1;
-                                if (!isAScheduled && isBScheduled) return 1;
-                                if (isAScheduled && isBScheduled) {
-                                    return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
-                                }
-                                
-                                const timeA = (a as Channel).last_stream_start_time ? new Date((a as Channel).last_stream_start_time!).getTime() : 0;
-                                const timeB = (b as Channel).last_stream_start_time ? new Date((b as Channel).last_stream_start_time!).getTime() : 0;
-                                return timeB - timeA;
-                           }).map((item, index) => {
-                               if ('streamer' in item) { // It's a EnrichedScheduledStream
-                                   return (
-                                       <div key={item.id} className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: `${200 + index * 30}ms` }}>
-                                         <ScheduledStreams.Card 
-                                            schedule={item}
-                                            onCardClick={() => setSelectedStreamer(item.streamer)}
-                                            isNotificationSubscribed={!!streamerNotificationSettings[item.streamer.username]}
-                                            onNotificationToggle={updateStreamerNotificationSetting}
-                                            notificationPermission={notificationPermission}
-                                            isFavorite={isFavorite(item.streamer.username)}
-                                            onToggleFavorite={toggleFavorite}
-                                         />
-                                       </div>
-                                   )
-                               } else { // It's a Channel
-                                   return (
-                                     <div key={item.username} className={isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} style={{ animationDelay: `${200 + index * 30}ms` }}>
-                                         <StreamerCard 
-                                            streamer={item} 
-                                            onCardClick={() => setSelectedStreamer(item)}
-                                            isNotificationSubscribed={!!streamerNotificationSettings[item.username]}
-                                            onNotificationToggle={updateStreamerNotificationSetting}
-                                            notificationPermission={notificationPermission}
-                                            isFavorite={isFavorite(item.username)}
-                                            onToggleFavorite={toggleFavorite}
-                                         />
-                                     </div>
-                                   );
-                               }
-                           })}
-                        </main>
-                    ) : (
-                         <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
-                          <h3 className="text-2xl font-bold" style={{ color: 'var(--text-title)' }}>{t('noFavoritesTitle')}</h3>
-                          <p className="mt-2 text-base" style={{ color: 'var(--text-body)' }}>{t('noFavoritesBody')}</p>
+
+                    {multiStreamSelection.length > 0 && (
+                        <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '50ms' }}>
+                            <button
+                                onClick={handleGenerateMultiStreamLink}
+                                className="w-full max-w-sm rounded-xl border border-white/10 bg-white/10 px-8 py-3 text-lg font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 text-center"
+                            >
+                                {t('generateMultiStream')}
+                            </button>
                         </div>
                     )}
-                </>
-          ) : null }
+                    
+                    {multiStreamLink && (
+                        <div className={`space-y-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '100ms' }}>
+                            <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center gap-3">
+                                <a
+                                    href={multiStreamLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-grow w-full sm:w-auto flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-base font-semibold backdrop-blur-sm transition-all duration-300 ease-in-out hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 text-left rtl:text-right"
+                                >
+                                    <div className="flex -space-x-3 rtl:space-x-reverse overflow-hidden">
+                                        {selectedMultiStreamers.slice(0, 5).map(s => (
+                                            <img key={s.username} src={s.profile_pic || ''} alt={s.display_name} className="h-8 w-8 rounded-full border-2 border-white/50 dark:border-black/50 object-cover inline-block" />
+                                        ))}
+                                        {selectedMultiStreamers.length > 5 && (
+                                           <span className="h-8 w-8 rounded-full border-2 border-white/50 dark:border-black/50 bg-gray-600 flex items-center justify-center text-xs font-bold">+{selectedMultiStreamers.length - 5}</span>
+                                        )}
+                                    </div>
+                                    <span className="truncate">{t('multiStreamLink')}</span>
+                                </a>
+                                <button
+                                    onClick={handleCopyMultiStreamLink}
+                                    className="w-full sm:w-auto flex-shrink-0 flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                >
+                                    {isMultiStreamLinkCopied ? (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                            <span>{t('linkCopied')}</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                            <span>{t('copyLink')}</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {selectedMultiStreamers.length > 0 ? (
+                        <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {selectedMultiStreamers.map((streamer, index) => (
+                               <div key={streamer.username} className={isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} style={{ animationDelay: `${200 + index * 30}ms` }}>
+                                  <StreamerCard 
+                                    streamer={streamer} 
+                                    onCardClick={() => setSelectedStreamer(streamer)}
+                                    isNotificationSubscribed={!!streamerNotificationSettings[streamer.username]}
+                                    onNotificationToggle={updateStreamerNotificationSetting}
+                                    notificationPermission={notificationPermission}
+                                    isFavorite={isFavorite(streamer.username)}
+                                    onToggleFavorite={toggleFavorite}
+                                  />
+                              </div>
+                            ))}
+                        </main>
+                    ) : (
+                        <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
+                            <h3 className="text-2xl font-bold" style={{ color: 'var(--text-title)' }}>{t('noStreamersSelectedTitle')}</h3>
+                            <p className="mt-2 text-base" style={{ color: 'var(--text-body)' }}>{t('noStreamersSelectedBody')}</p>
+                        </div>
+                    )}
+                  </div>
+              )}
+              {view === 'favorites' && (
+                    <>
+                        <div className="relative z-10 space-y-6 mb-6">
+                            <div className={`flex flex-col items-center gap-4 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '150ms' }}>
+                                <div className="flex justify-center items-center flex-wrap gap-4">
+                                    <button onClick={handleCopyLinks} disabled={isCopyButtonDisabled} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                      {isLinksCopied ? ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg><span>{t('copied')}</span></> ) : ( <><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg><span>{copyButtonText}</span></> )}
+                                    </button>
+                                    <button onClick={handleClearFavorites} disabled={!hasFavorites} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed text-red-400">
+                                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                       <span>{t('clearFavorites')}</span>
+                                    </button>
+                                </div>
+                                <div className="flex justify-center items-center flex-wrap gap-x-6 gap-y-2 text-sm border border-white/10 bg-black/5 dark:bg-white/5 rounded-full px-4 py-2 backdrop-blur-sm">
+                                    <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-green-400"></span><span>{t('liveCount', { count: favoritesLiveCount })}</span></span>
+                                    <div className="h-4 w-px bg-white/20 hidden sm:block"></div>
+                                    <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-red-500"></span><span>{t('offlineCount', { count: favoritesOfflineCount })}</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        {hasFavorites ? (
+                            <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                               {[...favoriteLiveStreamers, ...favoriteScheduledStreamers].sort((a,b) => {
+                                    const isALive = 'is_live' in a && a.is_live;
+                                    const isBLive = 'is_live' in b && b.is_live;
+                                    if (isALive && !isBLive) return -1;
+                                    if (!isALive && isBLive) return 1;
+                                    if (isALive && isBLive) {
+                                        return ((b as Channel).viewer_count ?? 0) - ((a as Channel).viewer_count ?? 0);
+                                    }
+                                    
+                                    const isAScheduled = 'startTime' in a;
+                                    const isBScheduled = 'startTime' in b;
+                                    if (isAScheduled && !isBScheduled) return -1;
+                                    if (!isAScheduled && isBScheduled) return 1;
+                                    if (isAScheduled && isBScheduled) {
+                                        return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+                                    }
+                                    
+                                    const timeA = (a as Channel).last_stream_start_time ? new Date((a as Channel).last_stream_start_time!).getTime() : 0;
+                                    const timeB = (b as Channel).last_stream_start_time ? new Date((b as Channel).last_stream_start_time!).getTime() : 0;
+                                    return timeB - timeA;
+                               }).map((item, index) => {
+                                   if ('streamer' in item) { // It's a EnrichedScheduledStream
+                                       return (
+                                           <div key={item.id} className={`${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: `${200 + index * 30}ms` }}>
+                                             <ScheduledStreams.Card 
+                                                schedule={item}
+                                                onCardClick={() => setSelectedStreamer(item.streamer)}
+                                                isNotificationSubscribed={!!streamerNotificationSettings[item.streamer.username]}
+                                                onNotificationToggle={updateStreamerNotificationSetting}
+                                                notificationPermission={notificationPermission}
+                                                isFavorite={isFavorite(item.streamer.username)}
+                                                onToggleFavorite={toggleFavorite}
+                                             />
+                                           </div>
+                                       )
+                                   } else { // It's a Channel
+                                       return (
+                                         <div key={item.username} className={isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'} style={{ animationDelay: `${200 + index * 30}ms` }}>
+                                             <StreamerCard 
+                                                streamer={item} 
+                                                onCardClick={() => setSelectedStreamer(item)}
+                                                isNotificationSubscribed={!!streamerNotificationSettings[item.username]}
+                                                onNotificationToggle={updateStreamerNotificationSetting}
+                                                notificationPermission={notificationPermission}
+                                                isFavorite={isFavorite(item.username)}
+                                                onToggleFavorite={toggleFavorite}
+                                             />
+                                         </div>
+                                       );
+                                   }
+                               })}
+                            </main>
+                        ) : (
+                             <div className={`text-center py-16 text-black/80 dark:text-white/80 ${isAnimatingOut ? 'animate-item-pop-out' : 'animate-item-pop-in'}`} style={{ animationDelay: '200ms' }}>
+                              <h3 className="text-2xl font-bold" style={{ color: 'var(--text-title)' }}>{t('noFavoritesTitle')}</h3>
+                              <p className="mt-2 text-base" style={{ color: 'var(--text-body)' }}>{t('noFavoritesBody')}</p>
+                            </div>
+                        )}
+                    </>
+              )}
+            </div>
+        </div>
+        <div style={{ display: view === 'share' ? 'block' : 'none' }}>
+            <div className="animation-container mt-8 relative z-30">
+                 <ShareStreamView
+                    liveStreamers={streamerData?.data.filter(s => s.is_live) || []}
+                    isAnimatingOut={isAnimatingOut}
+                    windows={shareViewWindows}
+                    setWindows={setShareViewWindows}
+                    nextZIndex={shareViewNextZIndex}
+                    setNextZIndex={setShareViewNextZIndex}
+                    extraSpace={shareViewExtraSpace}
+                    setExtraSpace={setShareViewExtraSpace}
+                />
+            </div>
         </div>
       </div>
+      
       <StreamerModal streamer={selectedStreamer} onClose={() => setSelectedStreamer(null)} />
       {ENABLE_APPLY_SECTION && <ApplySection />}
       <Footer />

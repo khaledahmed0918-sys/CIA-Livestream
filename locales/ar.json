@@ -59,5 +59,8 @@
   "failedToLoadData": "فشل تحميل البيانات",
   "applyTitle": "قدم للـ CIA كـممنتج",
   "applyButton": "تقديم",
-  "sidebarApply": "التقديم للـ CIA"
+  "sidebarApply": "التقديم للـ CIA",
+  "sidebarShareStream": "مشاركة البث",
+  "shareYourStreamTitle": "شارك بثوثك",
+  "addStreamWindow": "إضافة نافذة بث"
 }
