@@ -694,6 +694,14 @@ const App: React.FC = () => {
       });
   };
 
+  const soonestSchedule = useMemo(() => {
+    if (scheduleStats.enrichedSchedules && scheduleStats.enrichedSchedules.length > 0) {
+        // The list is already sorted by startTime ascending in ScheduledStreams component
+        return scheduleStats.enrichedSchedules[0];
+    }
+    return null;
+  }, [scheduleStats.enrichedSchedules]);
+
 
   return (
     <div className="min-h-screen w-full transition-colors duration-300" style={{ color: 'var(--text-body)' }}>
@@ -711,6 +719,7 @@ const App: React.FC = () => {
         showApplyLink={ENABLE_APPLY_SECTION}
         hasFavorites={hasFavorites}
         showShareStreamLink={ENABLE_SHARE_STREAM_VIEW}
+        soonestSchedule={soonestSchedule}
       />
 
       <div className="container mx-auto px-4 py-8">

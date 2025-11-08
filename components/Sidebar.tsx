@@ -1,5 +1,7 @@
 import React from 'react';
 import { useLocalization } from '../hooks/useLocalization';
+import { useCountdown } from '../hooks/useCountdown';
+import type { EnrichedScheduledStream } from './ScheduledStreamCard';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,9 +11,40 @@ interface SidebarProps {
   showApplyLink: boolean;
   hasFavorites: boolean;
   showShareStreamLink: boolean;
+  soonestSchedule: EnrichedScheduledStream | null;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, activeView, showApplyLink, hasFavorites, showShareStreamLink }) => {
+const CountdownTimer: React.FC<{ targetDate: string, activeView: SidebarProps['activeView'] }> = ({ targetDate, activeView }) => {
+    const { days, hours, minutes, seconds, isOver } = useCountdown(targetDate);
+    if (isOver) return null;
+    
+    const parts = [];
+    if (days > 0) {
+        parts.push(`${days}d`);
+        parts.push(`${hours}h`);
+    } else if (hours > 0) {
+        parts.push(`${hours}h`);
+        parts.push(`${minutes}m`);
+    } else if (minutes > 0) {
+        parts.push(`${minutes}m`);
+        parts.push(`${seconds}s`);
+    } else {
+        parts.push(`${seconds}s`);
+    }
+
+    // FIX: 'activeView' was not defined in this component's scope. It is now passed as a prop.
+    const timerClass = activeView === 'scheduled' 
+      ? 'bg-white/20 text-white' 
+      : 'bg-black/10 dark:bg-white/10';
+
+    return (
+        <span className={`text-xs font-mono rounded-md px-2 py-1 transition-colors ${timerClass}`}>
+            {parts.join(' ')}
+        </span>
+    );
+};
+
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, activeView, showApplyLink, hasFavorites, showShareStreamLink, soonestSchedule }) => {
   const { t } = useLocalization();
 
   return (
@@ -56,9 +89,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onNavigate, a
             <li>
               <button
                 onClick={() => onNavigate('scheduled')}
-                className={`w-full text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'scheduled' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
+                className={`w-full flex items-center justify-between text-left rtl:text-right px-4 py-3 rounded-lg text-lg font-semibold transition-colors ${activeView === 'scheduled' ? 'bg-blue-500 text-white' : 'hover:bg-black/10 dark:hover:bg-white/10'}`}
               >
-                {t('sidebarScheduleStreams')}
+                <span>{t('sidebarScheduleStreams')}</span>
+                {soonestSchedule && <CountdownTimer targetDate={soonestSchedule.startTime} activeView={activeView} />}
               </button>
             </li>
              <li>
