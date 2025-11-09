@@ -8,7 +8,7 @@ import { StreamerCard } from './StreamerCard';
 import { ThemeToggle } from './components/ThemeToggle';
 import { TagFilter } from './components/TagFilter';
 import { useLocalization } from './hooks/useLocalization';
-import { requestNotificationPermission, registerServiceWorker, showLiveNotification } from './utils/notificationManager';
+import { requestNotificationPermission, showLiveNotification } from './utils/notificationManager';
 import { StreamerModal } from './StreamerModal';
 import { quranicVerses } from './data/quranicVerses';
 import type { QuranicVerse as VerseType } from './data/quranicVerses';
@@ -310,7 +310,6 @@ const App: React.FC = () => {
     }
 
     setNotificationPermission(typeof Notification !== 'undefined' ? Notification.permission : null);
-    registerServiceWorker();
     const settingsLS = JSON.parse(localStorage.getItem('streamerNotifications') || '{}');
     setStreamerNotificationSettings(settingsLS);
   }, []);
@@ -498,7 +497,10 @@ const App: React.FC = () => {
             if (a.is_live && b.is_live) {
               return (b.viewer_count ?? 0) - (a.viewer_count ?? 0);
             }
-            return a.username.localeCompare(b.username);
+            // For offline streamers, sort by last seen (more recent first)
+            const dateA = a.last_stream_start_time ? new Date(a.last_stream_start_time).getTime() : 0;
+            const dateB = b.last_stream_start_time ? new Date(b.last_stream_start_time).getTime() : 0;
+            return dateB - dateA;
         });
         return streamersToSort;
         

@@ -1,21 +1,6 @@
 import type { Channel } from '../types';
 
-const VAPID_PUBLIC_KEY = 'YOUR_VAPID_PUBLIC_KEY'; // This is not used for client-side notifications but is required for push subscriptions.
-
-// Function to register the service worker
-export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
-  if ('serviceWorker' in navigator) {
-    try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('Service Worker registered with scope:', registration.scope);
-      return registration;
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
-      return null;
-    }
-  }
-  return null;
-};
+// The service worker is now registered in index.tsx. This file only handles permission and showing notifications.
 
 // Function to request notification permission
 export const requestNotificationPermission = async (): Promise<NotificationPermission> => {
@@ -40,6 +25,7 @@ export const showLiveNotification = async (streamer: Channel, bodyText: string) 
     return;
   }
 
+  // Get the already registered service worker
   const registration = await navigator.serviceWorker.getRegistration();
   if (!registration) {
     console.error('No service worker registered to show notification.');
@@ -47,12 +33,17 @@ export const showLiveNotification = async (streamer: Channel, bodyText: string) 
   }
   
   const notificationTitle = streamer.display_name;
-  const notificationOptions: NotificationOptions = {
+  // FIX: The 'renotify' property is a valid option for service worker notifications
+  // but is not in the standard NotificationOptions type definition.
+  // Casting to 'any' bypasses this TypeScript type check.
+  const notificationOptions: any = {
     body: bodyText,
-    icon: streamer.profile_pic || '/vite.svg',
+    icon: streamer.profile_pic || 'https://i.postimg.cc/QNW4B8KQ/00WZrbng.png', // Fallback icon
     data: {
       url: streamer.live_url,
     },
+    tag: streamer.username, // Use a tag to prevent multiple notifications for the same streamer
+    renotify: true, // Allow re-notifying if the tag is the same
   };
 
   await registration.showNotification(notificationTitle, notificationOptions);

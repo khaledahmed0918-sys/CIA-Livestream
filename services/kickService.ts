@@ -5,6 +5,8 @@ import type { Channel, KickApiResponse } from '../types';
 // A backend proxy should be used to handle API keys, caching, and rate limits to avoid CORS issues and exposure of secrets.
 // This implementation is for demonstration purposes only.
 
+const DEFAULT_PROFILE_PIC = 'https://i.postimg.cc/QNW4B8KQ/00WZrbng.png'; // Using the favicon as a fallback
+
 /**
  * Extracts a clean username from a string, which can be a username or a full Kick URL.
  * @param input The string to parse.
@@ -76,7 +78,7 @@ const fetchKickChannel = async (originalUsername: string): Promise<Channel> => {
     return {
       username: originalUsername,
       display_name: originalUsername,
-      profile_pic: data.user.profile_pic || null,
+      profile_pic: data.user.profile_pic || DEFAULT_PROFILE_PIC,
       is_live: isLive,
       live_title: data.livestream?.session_title || null,
       viewer_count: data.livestream?.viewer_count ?? null,
@@ -96,7 +98,7 @@ const fetchKickChannel = async (originalUsername: string): Promise<Channel> => {
     return {
       username: originalUsername,
       display_name: originalUsername,
-      profile_pic: null,
+      profile_pic: DEFAULT_PROFILE_PIC,
       is_live: false,
       live_title: null,
       viewer_count: null,
