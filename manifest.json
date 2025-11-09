@@ -1,7 +1,7 @@
 {
-  "name": "My React Site",
-  "short_name": "ReactApp",
-  "description": "My awesome React project!",
+  "name": "CIA Live Streams",
+  "short_name": "CIA Livestreams",
+  "description": "Simple site to see all cia Members in MTRP!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

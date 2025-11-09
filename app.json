@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "23f24996-dbc6-497c-9252-57a884ab3c81"
+      }
+    },
+    "owner": "cialivestreams",
+    "android": {
+      "package": "com.cialivestreams.cialivestreams"
+    }
+  }
+}
