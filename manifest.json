@@ -1,6 +1,6 @@
 {
   "name": "CIA Streams",
-  "short_name": "CIAStreams",
+  "short_name": "CIA Streams",
   "description": "Simple site to see all CIA members in MTRP.",
   "start_url": "https://cia-streams.pages.dev/",
   "display": "standalone",
